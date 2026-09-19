@@ -24,8 +24,8 @@
 ## 构建
 
 ```bash
-uv run --with ephem python /tmp/skygen.py   # 生成 sky-data.json
-# phase_strip 补算后，用任意 python 把 __DATA__ 替换为 JSON 注入模板 → sketch.html
+uv run --with ephem python3 skygen.py
+# 自动计算星历数据、生成 sky-data.json 并注入 sketch_template.html 输出 sketch.html
 ```
 
 ## 验证方法（环境无 vision API，不能"看"图）
