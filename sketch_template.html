@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>今晚的月亮 · 2026-09-19</title>
+<script>p5.disableFriendlyErrors = true;</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/p5.min.js"></script>
+<style>
+  html,body{margin:0;padding:0;background:#050810;overflow:hidden;}
+  canvas{display:block;}
+</style>
+</head>
+<body>
+<script>
+// ============================================================
+// 今晚的月亮 — 2026-09-19 22:30 CST · 东部沿海 31.2N 121.5E
+// 星历数据由 pyephem 本地计算后内嵌（__DATA__ 由注入脚本替换）
+// ============================================================
+const DATA = __DATA__;
+
+const PALETTE = {
+  night1: [8, 11, 22],
+  night2: [15, 19, 34],
+  ink:    [224, 228, 236],
+  dim:    [150, 160, 180],
+  faint:  [92, 102, 124],
+  gold:   [244, 234, 208],
+  moon:   [242, 238, 222],
+  moonsea:[168, 172, 178],
+  saturn: [218, 202, 162],
+  blue:   [128, 158, 205],
+  teal:   [95, 148, 156],
+};
+
+const CONFIG = { seed: 20260919 };
+const CX = 640;
+const CY = 700;
+const R  = 592;
+
+let stars = [], mwPts = [];
+let frame0 = 0;
+
+function setup() {
+  pixelDensity(1);
+  createCanvas(1280, 1810);
+  randomSeed(CONFIG.seed);
+  noiseSeed(CONFIG.seed);
+  colorMode(RGB, 255, 255, 255, 100);
+  buildStars();
+  buildMilkyWay();
+}
+
+// ---------- projection ----------
+function radecToXY(raDeg, decDeg) {
+  const r = (90 - decDeg) / 90 * R;
+  const th = radians(raDeg - 180);
+  return [CX + r * Math.sin(th), CY - r * Math.cos(th)];
+}
+
+function buildStars() {
+  stars = DATA.stars.map(s => {
+    const [x, y] = radecToXY(s.ra, s.dec);
+    return { n: s.n, x, y, mag: s.mag, alt0: s.alt0, bg: false };
+  });
+  for (let i = 0; i < 1500; i++) {
+    const ra = (i * 99.7 + 11.3) % 360;
+    const dec = 90 - ((i * 61.803 + 7.7) % 180);
+    const [x, y] = radecToXY(ra, dec);
+    const m = 4.7 + ((i * 37) % 100) / 100 * 1.9;
+    stars.push({ x, y, mag: m, bg: true, ph: (i * 13.7) % 6.28, spd: 0.5 + (i % 7) * 0.13 });
+  }
+}
+
+function buildMilkyWay() {
+  mwPts = DATA.mw_grain.map(p => {
+    const [x, y] = radecToXY(p.ra, p.dec);
+    return { x, y, a: p.a };
+  });
+}
+
+function starSize(mag) {
+  return Math.max(0.6, 3.4 - mag * 0.55);
+}
+
+// ---------- draw ----------
+function draw() {
+  drawBackground();
+  drawMilkyWay();
+  drawStars();
+  drawTriangle();
+  drawSaturn();
+  drawMoon();
+  drawDial();
+  drawPanel();
+  drawTitleBlock();
+  noLoop();
+}
+
+function drawBackground() {
+  noStroke();
+  for (let i = 0; i < height; i++) {
+    const t = i / height;
+    const c = lerpColor(color(PALETTE.night1), color(PALETTE.night2), Math.pow(t, 2.2));
+    stroke(c); line(0, i, width, i);
+  }
+  noStroke(); fill(3, 4, 9, 50);
+  rect(0, 0, width, height);
+  for (let rr = R; rr > 0; rr -= 6) {
+    const a = 12 * (1 - rr / R);
+    fill(20, 26, 44, a);
+    circle(CX, CY, rr * 2);
+  }
+}
+
+function drawMilkyWay() {
+  noStroke();
+  for (const p of DATA.mw_band) {
+    const [x, y] = radecToXY(p.ra, p.dec);
+    fill(PALETTE.blue[0], PALETTE.blue[1], PALETTE.blue[2], 8);
+    circle(x, y, 52);
+  }
+  for (const g of mwPts) {
+    fill(PALETTE.teal[0], PALETTE.teal[1], PALETTE.teal[2], g.a * 30);
+    circle(g.x, g.y, 2.2);
+  }
+}
+
+function drawStars() {
+  noStroke();
+  for (const s of stars) {
+    if (s.x < 0 || s.x > width || s.y < 0 || s.y > height) continue;
+    if (s.bg) {
+      const tw = 0.75 + 0.25 * Math.sin((frameCount % 60) * 0.04 * s.spd + s.ph);
+      fill(PALETTE.ink[0], PALETTE.ink[1], PALETTE.ink[2], 92 * tw);
+      circle(s.x, s.y, starSize(s.mag));
+    } else {
+      fill(PALETTE.blue[0], PALETTE.blue[1], PALETTE.blue[2], 30);
+      circle(s.x, s.y, starSize(s.mag) * 4.4);
+      fill(PALETTE.gold[0], PALETTE.gold[1], PALETTE.gold[2], 235);
+      circle(s.x, s.y, starSize(s.mag));
+      if (s.mag < 1.3) {
+        noFill(); stroke(PALETTE.gold[0], PALETTE.gold[1], PALETTE.gold[2], 70);
+        strokeWeight(1);
+        circle(s.x, s.y, starSize(s.mag) * 3.1);
+        noStroke();
+      }
+    }
+  }
+}
+
+function drawTriangle() {
+  const byName = {};
+  for (const s of stars) if (!s.bg) byName[s.n] = s;
+  const tri = ['Vega', 'Altair', 'Deneb'].map(n => byName[n]).filter(Boolean);
+  if (tri.length < 3) return;
+  noFill();
+  stroke(PALETTE.faint[0], PALETTE.faint[1], PALETTE.faint[2], 130);
+  strokeWeight(1.2);
+  beginShape();
+  for (const s of tri) vertex(s.x, s.y);
+  endShape(CLOSE);
+  textFont('Georgia');
+  textAlign(CENTER, CENTER);
+  textSize(17);
+  fill(PALETTE.dim[0], PALETTE.dim[1], PALETTE.dim[2], 200);
+  const namesZh = { Vega: '织女', Altair: '牛郎', Deneb: '天津四' };
+  for (const s of tri) text(namesZh[s.n], s.x, s.y - 20);
+  noStroke();
+}
+
+function drawSaturn() {
+  const a = DATA.saturn_track[0], b = DATA.saturn_track[DATA.saturn_track.length - 1];
+  const ra = (a.ra + b.ra) / 2, dec = (a.dec + b.dec) / 2;
+  const [x, y] = radecToXY(ra, dec);
+  push();
+  translate(x, y);
+  fill(PALETTE.saturn[0], PALETTE.saturn[1], PALETTE.saturn[2], 40);
+  circle(0, 0, 30);
+  fill(PALETTE.saturn[0], PALETTE.saturn[1], PALETTE.saturn[2]);
+  circle(0, 0, 7);
+  noFill();
+  stroke(PALETTE.saturn[0], PALETTE.saturn[1], PALETTE.saturn[2], 210);
+  strokeWeight(1.6);
+  ellipse(0, 0, 22, 7);
+  pop();
+  noStroke();
+  textFont('Georgia');
+  textAlign(CENTER, CENTER);
+  textSize(17);
+  fill(PALETTE.dim[0], PALETTE.dim[1], PALETTE.dim[2], 220);
+  text('土星', x, y + 24);
+}
+
+function drawMoon() {
+  // 轨迹：alt/az 映射到圆面内下方一段弧（西南象限）
+  noFill();
+  stroke(PALETTE.gold[0], PALETTE.gold[1], PALETTE.gold[2], 110);
+  strokeWeight(1.3);
+  beginShape();
+  for (const p of DATA.moon_track_alt) {
+    const rr = map(p.alt, 30, -12, R * 0.18, R * 0.52);
+    const th = radians(map(p.az, 200, 265, -55, 28));
+    vertex(CX + rr * Math.sin(th), CY + rr * Math.cos(th));
+  }
+  endShape();
+
+  const cur = DATA.moon_track_alt.find(p => p.m === 30) || DATA.moon_track_alt[6];
+  const rr = map(cur.alt, 30, -12, R * 0.18, R * 0.52);
+  const th = radians(map(cur.az, 200, 265, -55, 28));
+  const mx = CX + rr * Math.sin(th), my = CY + rr * Math.cos(th);
+
+  // ---- 月亮本体（盈凸月 57%，亮面朝西/右侧偏暗处理为左亮右暗示意）----
+  push();
+  translate(mx, my);
+  const Rm = 42;
+  for (let r2 = Rm * 2.6; r2 > Rm; r2 -= 8) {
+    noStroke(); fill(242, 238, 210, 2.4);
+    circle(0, 0, r2 * 2);
+  }
+  noStroke();
+  fill(PALETTE.moon[0], PALETTE.moon[1], PALETTE.moon[2]);
+  circle(0, 0, Rm * 2);
+  fill(PALETTE.moonsea[0], PALETTE.moonsea[1], PALETTE.moonsea[2], 60);
+  circle(-Rm * 0.25, -Rm * 0.35, Rm * 0.72);
+  circle(Rm * 0.1, -Rm * 0.05, Rm * 0.5);
+  circle(-Rm * 0.42, Rm * 0.2, Rm * 0.42);
+  circle(Rm * 0.34, Rm * 0.42, Rm * 0.3);
+  // 暗影（西侧）：右缘向内的椭圆削减
+  fill(PALETTE.night1[0], PALETTE.night1[1], PALETTE.night1[2], 235);
+  ellipse(Rm * 0.62, 0, Rm * 0.85, Rm * 1.94);
+  pop();
+
+  textFont('Georgia');
+  textAlign(CENTER, CENTER);
+  textSize(18);
+  fill(PALETTE.gold[0], PALETTE.gold[1], PALETTE.gold[2], 235);
+  text('月亮 · 57% 盈凸', mx, my - 64);
+  textSize(15);
+  fill(PALETTE.dim[0], PALETTE.dim[1], PALETTE.dim[2], 200);
+  text('高度 5.8° · 西南低空', mx, my - 40);
+  text('23:08 落山', mx, my + 72);
+  noStroke();
+}
+
+function drawDial() {
+  noFill();
+  stroke(PALETTE.faint[0], PALETTE.faint[1], PALETTE.faint[2], 150);
+  strokeWeight(1.4);
+  circle(CX, CY, R * 2);
+  strokeWeight(0.8);
+  for (let d = 15; d < 90; d += 15) {
+    const rr = (90 - d) / 90 * R;
+    circle(CX, CY, rr * 2);
+  }
+  for (let h = 0; h < 24; h += 2) {
+    const th = radians(h * 15 - 180);
+    const x1 = CX + R * Math.sin(th), y1 = CY - R * Math.cos(th);
+    const x2 = CX + (R + 14) * Math.sin(th), y2 = CY - (R + 14) * Math.cos(th);
+    stroke(PALETTE.faint[0], PALETTE.faint[1], PALETTE.faint[2], 170);
+    strokeWeight(1);
+    line(x1, y1, x2, y2);
+    if (h % 6 === 0) {
+      const x3 = CX + (R + 36) * Math.sin(th), y3 = CY - (R + 36) * Math.cos(th);
+      noStroke();
+      fill(PALETTE.dim[0], PALETTE.dim[1], PALETTE.dim[2], 190);
+      textAlign(CENTER, CENTER);
+      textFont('Georgia');
+      textSize(15);
+      text(h + 'h', x3, y3);
+      stroke(PALETTE.faint[0], PALETTE.faint[1], PALETTE.faint[2], 170);
+    }
+  }
+  noStroke();
+  fill(PALETTE.dim[0], PALETTE.dim[1], PALETTE.dim[2], 200);
+  textAlign(CENTER, CENTER);
+  textFont('Georgia');
+  textSize(15);
+  text('圆心 = 天顶 · 外环 = 地平线', CX, CY - R - 30);
+}
+
+function drawPanel() {
+  const py0 = CY + R + 64;
+  stroke(PALETTE.faint[0], PALETTE.faint[1], PALETTE.faint[2], 160);
+  strokeWeight(1);
+  line(90, py0, width - 90, py0);
+  noStroke();
+
+  textFont('Georgia');
+  textAlign(LEFT, BASELINE);
+
+  const lines = [
+    ['今晚 22:30 · 东部沿海（31.2°N 121.5°E）· 全天拱极投影 · 星历：pyephem 本地计算', 20, PALETTE.ink],
+    ['月亮：57% 盈凸 · 月龄 8.5 天 · 距离 403,400 km · 高度 5.8°（西南低空） · 23:08 落山', 17, PALETTE.dim],
+    ['土星：东南 46° · 0.4 等 · 全夜可见 · 夏季大三角过中天 · 银河（人马—天鹅段）斜贯天顶', 17, PALETTE.dim],
+    ['上弦精确时刻：今日 04:43 · 农历八月初九 · 中秋 09-25，满月时刻却在 09-27 凌晨 00:48（八月十七）', 17, PALETTE.gold],
+  ];
+  let y = py0 + 46;
+  for (const [txt, sz, col] of lines) {
+    textSize(sz);
+    fill(col[0], col[1], col[2]);
+    text(txt, 90, y);
+    y += sz + 22;
+  }
+
+  y += 14;
+  textSize(15);
+  fill(PALETTE.dim[0], PALETTE.dim[1], PALETTE.dim[2]);
+  text('未来六天的月亮（每晚同一时刻 22:30）', 90, y);
+  y += 30;
+  const stripX0 = 130, stripW = width - 260;
+  for (let i = 0; i < DATA.phase_strip.length; i++) {
+    const ph = DATA.phase_strip[i];
+    const px = stripX0 + stripW * (i + 0.5) / DATA.phase_strip.length;
+    const rm = 21;
+    noStroke();
+    fill(PALETTE.moon[0], PALETTE.moon[1], PALETTE.moon[2]);
+    circle(px, y, rm * 2);
+    const k = ph.illum / 100;
+    fill(PALETTE.night1[0], PALETTE.night1[1], PALETTE.night1[2], 235);
+    ellipse(px + rm * (1 - k), y, 2 * rm * (1 - k) * 0.92, 2 * rm * 0.98);
+    noFill(); stroke(PALETTE.faint[0], PALETTE.faint[1], PALETTE.faint[2], 120);
+    strokeWeight(0.8);
+    circle(px, y, rm * 2);
+    noStroke();
+    textSize(14);
+    fill(PALETTE.dim[0], PALETTE.dim[1], PALETTE.dim[2], 210);
+    textAlign(CENTER, CENTER);
+    text(ph.date, px, y + rm + 18);
+    if (ph.date === '09-25') {
+      fill(PALETTE.gold[0], PALETTE.gold[1], PALETTE.gold[2], 230);
+      text('中秋 · ' + ph.illum + '%', px, y - rm - 16);
+    }
+  }
+}
+
+function drawTitleBlock() {
+  noStroke();
+  textFont('Georgia');
+  textAlign(LEFT, BASELINE);
+  textSize(34);
+  fill(PALETTE.ink[0], PALETTE.ink[1], PALETTE.ink[2]);
+  text('今晚的月亮', 90, 100);
+  textSize(19);
+  fill(PALETTE.dim[0], PALETTE.dim[1], PALETTE.dim[2]);
+  text('2026-09-19 · 农历八月初九 · 上弦后第一夜', 90, 138);
+  textAlign(RIGHT, BASELINE);
+  textSize(15);
+  fill(PALETTE.faint[0], PALETTE.faint[1], PALETTE.faint[2]);
+  text('数据：pyephem 星历 · 本地计算', width - 90, 96);
+  text('图：Hoshi · p5.js', width - 90, 122);
+}
+</script>
+</body>
+</html>
