@@ -47,6 +47,22 @@ class TestSkygen(unittest.TestCase):
         self.assertIn("401", panel_lines[1][0])
         self.assertIn("距中秋（09-25 望夕）还有 5 天", panel_lines[3][0])
 
+    def test_compute_sky_data_2026_09_21(self):
+        data = skygen.compute_sky_data(date_str="2026-09-21", time_str="22:30")
+        self.assertAlmostEqual(data["moon_t0"]["illum"], 75.1, delta=0.5)
+        self.assertAlmostEqual(data["moon_t0"]["alt"], 23.77, delta=0.5)
+        # Moon sets at 01:03 on Sep 22
+        self.assertIn("2026-09-22 01:03", data["moonset_local"])
+        self.assertIn("八月十一", data.get("title_sub", ""))
+        self.assertIn("2026-09-21", data.get("title_sub", ""))
+        
+        # Check panel lines
+        panel_lines = data.get("panel_lines", [])
+        self.assertEqual(len(panel_lines), 4)
+        self.assertIn("75%", panel_lines[1][0])
+        self.assertIn("397", panel_lines[1][0])
+        self.assertIn("距中秋（09-25 望夕）还有 4 天", panel_lines[3][0])
+
     def test_phase_strip_progression(self):
         data = skygen.compute_sky_data(date_str="2026-09-20", time_str="22:30")
         strip = data["phase_strip"]
