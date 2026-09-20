@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
 <meta charset="UTF-8">
-<title>今晚的月亮 · 2026-09-19</title>
+<title>今晚的月亮</title>
 <script>p5.disableFriendlyErrors = true;</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/p5.min.js"></script>
 <style>
@@ -13,8 +13,7 @@
 <body>
 <script>
 // ============================================================
-// 今晚的月亮 — 2026-09-19 22:30 CST · 东部沿海 31.2N 121.5E
-// 星历数据由 pyephem 本地计算后内嵌
+// 今晚的月亮 — 星历数据由 pyephem 本地计算后内嵌
 // ============================================================
 const DATA = __DATA__;
 
@@ -32,7 +31,7 @@ const PALETTE = {
   teal:   [95, 148, 156],
 };
 
-const CONFIG = { seed: 20260919 };
+const CONFIG = { seed: DATA.seed || 20260920 };
 const CX = 640;
 const CY = 700;
 const R  = 592;
@@ -48,6 +47,9 @@ function setup() {
   colorMode(RGB, 255, 255, 255, 100);
   buildStars();
   buildMilkyWay();
+  if (DATA.title_sub) {
+    document.title = (DATA.title_main || '今晚的月亮') + ' · ' + DATA.title_sub.split(' · ')[0];
+  }
 }
 
 // ---------- projection ----------
@@ -209,7 +211,7 @@ function drawMoon() {
   const th = radians(map(cur.az, 200, 265, -55, 28));
   const mx = CX + rr * Math.sin(th), my = CY + rr * Math.cos(th);
 
-  // ---- 月亮本体（盈凸月 57%，亮面朝西/右侧偏暗处理为左亮右暗示意）----
+  // ---- 月亮本体（亮面朝西南/左侧，右缘削减暗影）----
   push();
   translate(mx, my);
   const Rm = 42;
@@ -225,20 +227,27 @@ function drawMoon() {
   circle(Rm * 0.1, -Rm * 0.05, Rm * 0.5);
   circle(-Rm * 0.42, Rm * 0.2, Rm * 0.42);
   circle(Rm * 0.34, Rm * 0.42, Rm * 0.3);
+
   // 暗影（西侧）：右缘向内的椭圆削减
-  fill(PALETTE.night1[0], PALETTE.night1[1], PALETTE.night1[2], 235);
-  ellipse(Rm * 0.62, 0, Rm * 0.85, Rm * 1.94);
+  const curIllum = (DATA.moon_t0 && DATA.moon_t0.illum != null) ? DATA.moon_t0.illum : (cur.illum || 57);
+  const k = curIllum / 100;
+  const shadowW = Math.max(0, 2 * Rm * (1 - k));
+  if (shadowW > 1) {
+    fill(PALETTE.night1[0], PALETTE.night1[1], PALETTE.night1[2], 235);
+    ellipse(Rm * k, 0, shadowW, Rm * 1.94);
+  }
   pop();
 
   textFont('Georgia');
   textAlign(CENTER, CENTER);
   textSize(18);
   fill(PALETTE.gold[0], PALETTE.gold[1], PALETTE.gold[2], 235);
-  text('月亮 · 57% 盈凸', mx, my - 64);
+  text(DATA.moon_label || ('月亮 · ' + Math.round(curIllum) + '% 盈凸'), mx, my - 64);
   textSize(15);
   fill(PALETTE.dim[0], PALETTE.dim[1], PALETTE.dim[2], 200);
-  text('高度 5.8° · 西南低空', mx, my - 40);
-  text('23:08 落山', mx, my + 72);
+  text(DATA.moon_alt_az_text || ('高度 ' + cur.alt.toFixed(1) + '° · 西南天空'), mx, my - 40);
+  const mSetText = DATA.moonset_text || (DATA.moonset_local ? DATA.moonset_local.slice(11, 16) + ' 落山' : '');
+  text(mSetText, mx, my + 72);
   noStroke();
 }
 
@@ -288,12 +297,20 @@ function drawPanel() {
   textFont('Georgia');
   textAlign(LEFT, BASELINE);
 
-  const lines = [
+  const defaultLines = [
     ['今晚 22:30 · 东部沿海（31.2°N 121.5°E）· 全天拱极投影 · 星历：pyephem 本地计算', 20, PALETTE.ink],
     ['月亮：57% 盈凸 · 月龄 8.5 天 · 距离 403,400 km · 高度 5.8°（西南低空） · 23:08 落山', 17, PALETTE.dim],
     ['土星：东南 46° · 0.4 等 · 全夜可见 · 夏季大三角过中天 · 银河（人马—天鹅段）斜贯天顶', 17, PALETTE.dim],
     ['上弦精确时刻：今日 04:43 · 农历八月初九 · 中秋 09-25，满月时刻却在 09-27 凌晨 00:48（八月十七）', 17, PALETTE.gold],
   ];
+  const rawLines = DATA.panel_lines || defaultLines;
+  const lines = rawLines.map(([txt, sz, colKey]) => {
+    let col = PALETTE.dim;
+    if (Array.isArray(colKey)) col = colKey;
+    else if (PALETTE[colKey]) col = PALETTE[colKey];
+    return [txt, sz, col];
+  });
+
   let y = py0 + 46;
   for (const [txt, sz, col] of lines) {
     textSize(sz);
@@ -326,7 +343,10 @@ function drawPanel() {
     fill(PALETTE.dim[0], PALETTE.dim[1], PALETTE.dim[2], 210);
     textAlign(CENTER, CENTER);
     text(ph.date, px, y + rm + 18);
-    if (ph.date === '09-25') {
+    if (ph.label) {
+      fill(PALETTE.gold[0], PALETTE.gold[1], PALETTE.gold[2], 230);
+      text(ph.label, px, y - rm - 16);
+    } else if (ph.date === '09-25') {
       fill(PALETTE.gold[0], PALETTE.gold[1], PALETTE.gold[2], 230);
       text('中秋 · ' + ph.illum + '%', px, y - rm - 16);
     }
@@ -339,10 +359,10 @@ function drawTitleBlock() {
   textAlign(LEFT, BASELINE);
   textSize(34);
   fill(PALETTE.ink[0], PALETTE.ink[1], PALETTE.ink[2]);
-  text('今晚的月亮', 90, 100);
+  text(DATA.title_main || '今晚的月亮', 90, 100);
   textSize(19);
   fill(PALETTE.dim[0], PALETTE.dim[1], PALETTE.dim[2]);
-  text('2026-09-19 · 农历八月初九 · 上弦后第一夜', 90, 138);
+  text(DATA.title_sub || '2026-09-19 · 农历八月初九 · 上弦后第一夜', 90, 138);
   textAlign(RIGHT, BASELINE);
   textSize(15);
   fill(PALETTE.faint[0], PALETTE.faint[1], PALETTE.faint[2]);
