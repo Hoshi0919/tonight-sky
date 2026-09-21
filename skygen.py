@@ -223,6 +223,9 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
 
     obs.date = utc_dt
     sat.compute(obs)
+    moon.compute(obs)
+    moon_sat_sep = math.degrees(float(ephem.separation(moon, sat)))
+    out['moon_sat_sep'] = round(moon_sat_sep, 1)
     sat_alt = math.degrees(float(sat.alt))
     sat_az = math.degrees(float(sat.az))
     sat_az_zh = azimuth_to_zh(sat_az)
@@ -299,13 +302,19 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
         elif sday == 27:
             item['label'] = f"满月 · {round(moon.phase, 1)}%"
         strip.append(item)
+    obs.date = utc_dt
+    moon.compute(obs)
     out['phase_strip'] = strip
     out['station_pass'] = []
 
     # 7. Panel lines
     l1 = f"今晚 {time_str} · 东部沿海（{lat}°N {lon}°E）· 全天拱极投影 · 星历：pyephem 本地计算"
     l2 = f"月亮：{round(moon_illum)}% {phase_short} · 月龄 {age_d:.1f} 天 · 距离 {moon_dist_km:,.0f} km · 高度 {moon_alt:.1f}°（{moon_az_zh}天空） · {moonset_str}"
-    l3 = f"土星：{sat_az_zh} {round(sat_alt)}° · {sat.mag:.1f} 等 · 全夜可见 · 夏季大三角过中天 · 银河（人马—天鹅段）斜贯天顶"
+    if moon_sat_sep <= 12.0:
+        sat_event = f"土星伴月（相距 {moon_sat_sep:.1f}°）"
+    else:
+        sat_event = "全夜可见"
+    l3 = f"土星：{sat_az_zh} {round(sat_alt)}° · {sat.mag:.1f} 等 · {sat_event} · 夏季大三角西斜 · 飞马四边形高悬 · 银河斜贯天顶"
     days_to_midautumn = (datetime.date(2026, 9, 25) - local_dt.date()).days
     days_to_equinox = (datetime.date(2026, 9, 23) - local_dt.date()).days
 

@@ -200,5 +200,31 @@ class TestSkygen(unittest.TestCase):
         self.assertIn('东南天空', d27['panel_lines'][1][0])
         self.assertIn('满月', d27['panel_lines'][1][0])
 
+    def test_saturn_conjunction_and_panel_line3(self):
+        # 09-21: Normal distance
+        d21 = skygen.compute_sky_data(date_str='2026-09-21', time_str='22:30')
+        self.assertIn('moon_sat_sep', d21)
+        self.assertGreater(d21['moon_sat_sep'], 70)
+        self.assertIn('全夜可见', d21['panel_lines'][2][0])
+        self.assertIn('夏季大三角西斜', d21['panel_lines'][2][0])
+        self.assertIn('飞马四边形高悬', d21['panel_lines'][2][0])
+
+        # 09-27: Saturn-Moon conjunction during full moon (separation < 10 deg)
+        d27 = skygen.compute_sky_data(date_str='2026-09-27', time_str='22:30')
+        self.assertIn('moon_sat_sep', d27)
+        self.assertLess(d27['moon_sat_sep'], 10.0)
+        self.assertIn('土星伴月', d27['panel_lines'][2][0])
+        self.assertIn(f"{d27['moon_sat_sep']:.1f}°", d27['panel_lines'][2][0])
+
+    def test_rendered_template_astronomy_labels(self):
+        d21 = skygen.compute_sky_data(date_str='2026-09-21', time_str='22:30')
+        tpl_path = DIR / 'sketch_template.html'
+        rendered = skygen.render_template(d21, tpl_path)
+        self.assertIn('圆心 = 北天极', rendered)
+        self.assertIn('外环 = 天赤道', rendered)
+        self.assertIn('未来五日关键月相演进', rendered)
+        self.assertNotIn('圆心 = 天顶', rendered)
+        self.assertNotIn('map(p.az, 200, 265', rendered)
+
 if __name__ == "__main__":
     unittest.main()
