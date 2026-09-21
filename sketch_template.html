@@ -170,6 +170,48 @@ function drawTriangle() {
   noStroke();
 }
 
+
+function drawMoonPhaseDisc(cx, cy, radius, illum, isWaxing, fillColor, baseColor) {
+  push();
+  translate(cx, cy);
+
+  if (baseColor) {
+    noStroke();
+    fill(baseColor[0], baseColor[1], baseColor[2], baseColor[3] != null ? baseColor[3] : 255);
+    circle(0, 0, radius * 2);
+  }
+
+  const k = Math.min(1.0, Math.max(0.0, illum / 100.0));
+  if (k > 0.005) {
+    noStroke();
+    fill(fillColor[0], fillColor[1], fillColor[2], fillColor[3] != null ? fillColor[3] : 255);
+    beginShape();
+    const steps = 36;
+    if (isWaxing) {
+      for (let i = 0; i <= steps; i++) {
+        const phi = -HALF_PI + PI * (i / steps);
+        vertex(radius * Math.cos(phi), radius * Math.sin(phi));
+      }
+      for (let i = steps; i >= 0; i--) {
+        const phi = -HALF_PI + PI * (i / steps);
+        vertex(-radius * (2 * k - 1) * Math.cos(phi), radius * Math.sin(phi));
+      }
+    } else {
+      for (let i = 0; i <= steps; i++) {
+        const phi = HALF_PI + PI * (i / steps);
+        vertex(radius * Math.cos(phi), radius * Math.sin(phi));
+      }
+      for (let i = steps; i >= 0; i--) {
+        const phi = -HALF_PI + PI * (i / steps);
+        vertex(radius * (2 * k - 1) * Math.cos(phi), radius * Math.sin(phi));
+      }
+    }
+    endShape(CLOSE);
+  }
+
+  pop();
+}
+
 function drawSaturn() {
   const a = DATA.saturn_track[0], b = DATA.saturn_track[DATA.saturn_track.length - 1];
   const ra = (a.ra + b.ra) / 2, dec = (a.dec + b.dec) / 2;
@@ -228,13 +270,38 @@ function drawMoon() {
   circle(-Rm * 0.42, Rm * 0.2, Rm * 0.42);
   circle(Rm * 0.34, Rm * 0.42, Rm * 0.3);
 
-  // 暗影（西侧）：右缘向内的椭圆削减
-  const curIllum = (DATA.moon_t0 && DATA.moon_t0.illum != null) ? DATA.moon_t0.illum : (cur.illum || 57);
-  const k = curIllum / 100;
-  const shadowW = Math.max(0, 2 * Rm * (1 - k));
-  if (shadowW > 1) {
+  // 严格天象暗影裁切：真实天穹仰望西侧在右，东侧在左。
+  // 盈月亮面朝西（右），暗影在东（左）；亏月亮面朝东（左），暗影在西（右）。
+  const curIllum = (DATA.moon_t0 && DATA.moon_t0.illum != null) ? DATA.moon_t0.illum : (cur.illum || 75);
+  const isWax = (DATA.moon_t0 && DATA.moon_t0.is_waxing != null) ? DATA.moon_t0.is_waxing : true;
+  const k = Math.min(1.0, Math.max(0.0, curIllum / 100.0));
+
+  if (k < 0.995) {
     fill(PALETTE.night1[0], PALETTE.night1[1], PALETTE.night1[2], 235);
-    ellipse(Rm * k, 0, shadowW, Rm * 1.94);
+    beginShape();
+    const steps = 36;
+    if (isWax) {
+      // 盈月：左半圆为外边缘（-x），向内连接终结线
+      for (let i = 0; i <= steps; i++) {
+        const phi = HALF_PI + PI * (i / steps);
+        vertex(Rm * Math.cos(phi), Rm * Math.sin(phi));
+      }
+      for (let i = steps; i >= 0; i--) {
+        const phi = -HALF_PI + PI * (i / steps);
+        vertex(-Rm * (2 * k - 1) * Math.cos(phi), Rm * Math.sin(phi));
+      }
+    } else {
+      // 亏月：右半圆为外边缘（+x），向内连接终结线
+      for (let i = 0; i <= steps; i++) {
+        const phi = -HALF_PI + PI * (i / steps);
+        vertex(Rm * Math.cos(phi), Rm * Math.sin(phi));
+      }
+      for (let i = steps; i >= 0; i--) {
+        const phi = -HALF_PI + PI * (i / steps);
+        vertex(Rm * (2 * k - 1) * Math.cos(phi), Rm * Math.sin(phi));
+      }
+    }
+    endShape(CLOSE);
   }
   pop();
 
@@ -329,12 +396,10 @@ function drawPanel() {
     const ph = DATA.phase_strip[i];
     const px = stripX0 + stripW * (i + 0.5) / DATA.phase_strip.length;
     const rm = 21;
-    noStroke();
-    fill(PALETTE.moon[0], PALETTE.moon[1], PALETTE.moon[2]);
-    circle(px, y, rm * 2);
-    const k = ph.illum / 100;
-    fill(PALETTE.night1[0], PALETTE.night1[1], PALETTE.night1[2], 235);
-    ellipse(px + rm * (1 - k), y, 2 * rm * (1 - k) * 0.92, 2 * rm * 0.98);
+    const isWax = ph.is_waxing != null ? ph.is_waxing : true;
+
+    drawMoonPhaseDisc(px, y, rm, ph.illum, isWax, PALETTE.moon, [PALETTE.night2[0], PALETTE.night2[1], PALETTE.night2[2], 200]);
+
     noFill(); stroke(PALETTE.faint[0], PALETTE.faint[1], PALETTE.faint[2], 120);
     strokeWeight(0.8);
     circle(px, y, rm * 2);

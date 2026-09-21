@@ -226,5 +226,28 @@ class TestSkygen(unittest.TestCase):
         self.assertNotIn('圆心 = 天顶', rendered)
         self.assertNotIn('map(p.az, 200, 265', rendered)
 
+    def test_moon_waxing_calculation_and_template_shadow(self):
+        d19 = skygen.compute_sky_data(date_str='2026-09-19', time_str='22:30')
+        self.assertTrue(d19['moon_t0']['is_waxing'])
+
+        d21 = skygen.compute_sky_data(date_str='2026-09-21', time_str='22:30')
+        self.assertTrue(d21['moon_t0']['is_waxing'])
+
+        d25 = skygen.compute_sky_data(date_str='2026-09-25', time_str='22:30')
+        self.assertTrue(d25['moon_t0']['is_waxing'])
+
+        # 09-27 22:30 is ~22h after exact full moon (00:48), so waning
+        d27 = skygen.compute_sky_data(date_str='2026-09-27', time_str='22:30')
+        self.assertFalse(d27['moon_t0']['is_waxing'])
+
+        for item in d21['phase_strip']:
+            self.assertIn('is_waxing', item)
+            self.assertIsInstance(item['is_waxing'], bool)
+
+        tpl_path = DIR / 'sketch_template.html'
+        rendered = skygen.render_template(d21, tpl_path)
+        self.assertIn('drawMoonPhaseDisc', rendered)
+        self.assertNotIn('ellipse(Rm * k, 0, shadowW', rendered)
+
 if __name__ == "__main__":
     unittest.main()

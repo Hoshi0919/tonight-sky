@@ -133,6 +133,8 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
     moon.compute(obs)
     prev_new = ephem.previous_new_moon(obs.date)
     next_full = ephem.next_full_moon(obs.date)
+    next_new = ephem.next_new_moon(obs.date)
+    is_waxing = next_full < next_new
     age_d = obs.date - prev_new
     moon_alt = math.degrees(float(moon.alt))
     moon_az = math.degrees(float(moon.az))
@@ -159,6 +161,7 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
         'dec': round(moon_dec, 3),
         'illum': round(moon_illum, 1),
         'phase_short': phase_short,
+        'is_waxing': bool(is_waxing),
         'age_d': round(age_d, 2),
         'distance_km': round(moon_dist_km)
     }
@@ -282,9 +285,13 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
         s_date = local_dt.date() + datetime.timedelta(days=(sday - day))
         obs.date = datetime.datetime(s_date.year, s_date.month, s_date.day, 14, 30, 0)
         moon.compute(obs)
+        nf = ephem.next_full_moon(obs.date)
+        nn = ephem.next_new_moon(obs.date)
+        strip_waxing = nf < nn
         item = {
             'date': f'{s_date.month:02d}-{s_date.day:02d}',
-            'illum': round(moon.phase, 1)
+            'illum': round(moon.phase, 1),
+            'is_waxing': bool(strip_waxing)
         }
         if sday == day:
             if sday == 23:
