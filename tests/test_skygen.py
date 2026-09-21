@@ -154,5 +154,51 @@ class TestSkygen(unittest.TestCase):
             finally:
                 sys.argv = old_argv
 
+
+    def test_azimuth_to_zh(self):
+        self.assertEqual(skygen.azimuth_to_zh(0), '正北')
+        self.assertEqual(skygen.azimuth_to_zh(45), '东北')
+        self.assertEqual(skygen.azimuth_to_zh(90), '正东')
+        self.assertEqual(skygen.azimuth_to_zh(135), '东南')
+        self.assertEqual(skygen.azimuth_to_zh(180), '正南')
+        self.assertEqual(skygen.azimuth_to_zh(225), '西南')
+        self.assertEqual(skygen.azimuth_to_zh(270), '正西')
+        self.assertEqual(skygen.azimuth_to_zh(315), '西北')
+        self.assertEqual(skygen.azimuth_to_zh(359), '正北')
+
+    def test_get_phase_short(self):
+        self.assertEqual(skygen.get_phase_short(1), '新月')
+        self.assertEqual(skygen.get_phase_short(4), '蛾眉')
+        self.assertEqual(skygen.get_phase_short(8), '上弦')
+        self.assertEqual(skygen.get_phase_short(11), '盈凸')
+        self.assertEqual(skygen.get_phase_short(15), '望月')
+        self.assertEqual(skygen.get_phase_short(17), '满月')
+
+    def test_dynamic_sky_azimuth_and_naming(self):
+        # 09-21: Waxing gibbous in southwest
+        d21 = skygen.compute_sky_data(date_str='2026-09-21', time_str='22:30')
+        self.assertEqual(d21['moon_t0']['az_zh'], '西南')
+        self.assertEqual(d21['moon_t0']['phase_short'], '盈凸')
+        self.assertIn('ra', d21['moon_t0'])
+        self.assertIn('dec', d21['moon_t0'])
+        self.assertIn('西南天空', d21['panel_lines'][1][0])
+        self.assertIn('东南', d21['panel_lines'][2][0])
+
+        # 09-25: Mid-Autumn in due south (not southwest!)
+        d25 = skygen.compute_sky_data(date_str='2026-09-25', time_str='22:30')
+        self.assertEqual(d25['moon_t0']['az_zh'], '正南')
+        self.assertEqual(d25['moon_t0']['phase_short'], '望月')
+        self.assertEqual(d25['moon_label'], '月亮 · 99% 望月')
+        self.assertIn('正南天空', d25['panel_lines'][1][0])
+        self.assertIn('望月', d25['panel_lines'][1][0])
+
+        # 09-27: Full moon climbing in southeast
+        d27 = skygen.compute_sky_data(date_str='2026-09-27', time_str='22:30')
+        self.assertEqual(d27['moon_t0']['az_zh'], '东南')
+        self.assertEqual(d27['moon_t0']['phase_short'], '满月')
+        self.assertEqual(d27['moon_label'], '月亮 · 99% 满月')
+        self.assertIn('东南天空', d27['panel_lines'][1][0])
+        self.assertIn('满月', d27['panel_lines'][1][0])
+
 if __name__ == "__main__":
     unittest.main()

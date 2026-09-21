@@ -33,6 +33,31 @@ STAR_NAMES = [
 def radec(body):
     return (math.degrees(float(body.ra)), math.degrees(float(body.dec)))
 
+def azimuth_to_zh(az_deg):
+    dirs = ['正北', '东北', '正东', '东南', '正南', '西南', '正西', '西北']
+    idx = round((az_deg % 360) / 45) % 8
+    return dirs[idx]
+
+def get_phase_short(lunar_day, illum=None):
+    if lunar_day == 1:
+        return '新月'
+    elif lunar_day < 8:
+        return '蛾眉'
+    elif lunar_day == 8:
+        return '上弦'
+    elif lunar_day < 15:
+        return '盈凸'
+    elif lunar_day in (15, 16):
+        return '望月'
+    elif lunar_day == 17:
+        return '满月'
+    elif lunar_day < 23:
+        return '亏凸'
+    elif lunar_day == 23:
+        return '下弦'
+    else:
+        return '残月' 
+
 def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='121.47', elevation=10, tz=8):
     if ephem is None:
         raise RuntimeError("ephem module is required to compute astronomical sky data")
@@ -111,13 +136,29 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
     age_d = obs.date - prev_new
     moon_alt = math.degrees(float(moon.alt))
     moon_az = math.degrees(float(moon.az))
+    moon_ra = math.degrees(float(moon.ra))
+    moon_dec = math.degrees(float(moon.dec))
     moon_illum = moon.phase
     moon_dist_km = moon.earth_distance * 149597870.7
+    moon_az_zh = azimuth_to_zh(moon_az)
+
+    # 3. Chinese lunar date calculation
+    local_new_dt = ephem.localtime(prev_new)
+    lunar_day = (local_dt.date() - local_new_dt.date()).days + 1
+    chinese_nums = ['初一','初二','初三','初四','初五','初六','初七','初八','初九','初十',
+                    '十一','十二','十三','十四','十五','十六','十七','十八','十九','二十',
+                    '廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十']
+    lunar_day_str = chinese_nums[lunar_day - 1] if 1 <= lunar_day <= 30 else f'{lunar_day}日'
+    phase_short = get_phase_short(lunar_day, moon_illum)
 
     out['moon_t0'] = {
         'alt': round(moon_alt, 2),
         'az': round(moon_az, 2),
+        'az_zh': moon_az_zh,
+        'ra': round(moon_ra, 3),
+        'dec': round(moon_dec, 3),
         'illum': round(moon_illum, 1),
+        'phase_short': phase_short,
         'age_d': round(age_d, 2),
         'distance_km': round(moon_dist_km)
     }
@@ -134,14 +175,6 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
     else:
         moonset_str = f"次日 {next_setting_dt.strftime('%H:%M')} 落山"
     out['moonset_text'] = moonset_str
-
-    # 3. Chinese lunar date calculation
-    local_new_dt = ephem.localtime(prev_new)
-    lunar_day = (local_dt.date() - local_new_dt.date()).days + 1
-    chinese_nums = ['初一','初二','初三','初四','初五','初六','初七','初八','初九','初十',
-                    '十一','十二','十三','十四','十五','十六','十七','十八','十九','二十',
-                    '廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十']
-    lunar_day_str = chinese_nums[lunar_day - 1] if 1 <= lunar_day <= 30 else f'{lunar_day}日'
 
     if lunar_day == 9:
         phase_term = '上弦后第一夜'
@@ -166,8 +199,11 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
 
     out['title_main'] = '今晚的月亮'
     out['title_sub'] = f"{date_str} · 农历八月{lunar_day_str} · {phase_term}"
-    out['moon_label'] = f"月亮 · {round(moon_illum)}% 盈凸"
-    out['moon_alt_az_text'] = f"高度 {moon_alt:.1f}° · 西南天空"
+    out['moon_label'] = f"月亮 · {round(moon_illum)}% {phase_short}"
+    if moon_alt < 0:
+        out['moon_alt_az_text'] = f"地平线下（高度 {moon_alt:.1f}° · {moon_az_zh}方向）"
+    else:
+        out['moon_alt_az_text'] = f"高度 {moon_alt:.1f}° · {moon_az_zh}天空"
 
     # 4. Saturn track
     sat = ephem.Saturn()
@@ -188,6 +224,8 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
     obs.date = utc_dt
     sat.compute(obs)
     sat_alt = math.degrees(float(sat.alt))
+    sat_az = math.degrees(float(sat.az))
+    sat_az_zh = azimuth_to_zh(sat_az)
 
     # 5. Milky Way: band + seeded grain
     rng = random.Random(out['seed'])
@@ -266,8 +304,8 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
 
     # 7. Panel lines
     l1 = f"今晚 {time_str} · 东部沿海（{lat}°N {lon}°E）· 全天拱极投影 · 星历：pyephem 本地计算"
-    l2 = f"月亮：{round(moon_illum)}% 盈凸 · 月龄 {age_d:.1f} 天 · 距离 {moon_dist_km:,.0f} km · 高度 {moon_alt:.1f}°（西南天空） · {moonset_str}"
-    l3 = f"土星：东南 {round(sat_alt)}° · {sat.mag:.1f} 等 · 全夜可见 · 夏季大三角过中天 · 银河（人马—天鹅段）斜贯天顶"
+    l2 = f"月亮：{round(moon_illum)}% {phase_short} · 月龄 {age_d:.1f} 天 · 距离 {moon_dist_km:,.0f} km · 高度 {moon_alt:.1f}°（{moon_az_zh}天空） · {moonset_str}"
+    l3 = f"土星：{sat_az_zh} {round(sat_alt)}° · {sat.mag:.1f} 等 · 全夜可见 · 夏季大三角过中天 · 银河（人马—天鹅段）斜贯天顶"
     days_to_midautumn = (datetime.date(2026, 9, 25) - local_dt.date()).days
     days_to_equinox = (datetime.date(2026, 9, 23) - local_dt.date()).days
 
