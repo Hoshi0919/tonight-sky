@@ -147,16 +147,20 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
         phase_term = '上弦后第一夜'
     elif lunar_day == 10:
         phase_term = '宵月（盈凸）'
+    elif lunar_day == 13 and date_str == '2026-09-23':
+        phase_term = '秋分 · 盈凸月'
     elif lunar_day == 15:
         phase_term = '中秋节 · 望月'
+    elif lunar_day == 16:
+        phase_term = '十六夜 · 既望'
+    elif lunar_day == 17:
+        phase_term = '十七夜 · 望日满月'
     elif lunar_day < 8:
         phase_term = '蛾眉月'
     elif lunar_day == 8:
         phase_term = '上弦月'
     elif lunar_day < 15:
         phase_term = f'盈凸月（{round(moon_illum)}%）'
-    elif lunar_day == 16:
-        phase_term = '十六夜 · 既望'
     else:
         phase_term = f'盈凸月（月龄 {age_d:.1f} 天）'
 
@@ -215,20 +219,43 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
     # 6. Phase strip (progression across key dates)
     if date_str == '2026-09-19':
         strip_days = [19, 21, 23, 25, 27]
+    elif date_str == '2026-09-20':
+        strip_days = [20, 22, 24, 25, 27]
+    elif day == 21:
+        strip_days = [21, 23, 25, 27, 29]
+    elif day == 22:
+        strip_days = [22, 23, 25, 27, 29]
+    elif day == 23:
+        strip_days = [23, 24, 25, 27, 29]
+    elif day == 24:
+        strip_days = [24, 25, 26, 27, 29]
+    elif day == 25:
+        strip_days = [25, 26, 27, 28, 29]
+    elif day == 26:
+        strip_days = [26, 27, 28, 29, 30]
     else:
-        strip_days = [day, 22, 24, 25, 27] if day <= 20 else [day, min(day+2, 24), 25, 27, 29]
-        strip_days = sorted(list(set(strip_days)))
+        strip_days = [day + i for i in range(5)]
 
     strip = []
     for sday in strip_days:
-        obs.date = datetime.datetime(year, month, sday, 14, 30, 0)
+        s_date = local_dt.date() + datetime.timedelta(days=(sday - day))
+        obs.date = datetime.datetime(s_date.year, s_date.month, s_date.day, 14, 30, 0)
         moon.compute(obs)
         item = {
-            'date': f'{month:02d}-{sday:02d}',
+            'date': f'{s_date.month:02d}-{s_date.day:02d}',
             'illum': round(moon.phase, 1)
         }
         if sday == day:
-            item['label'] = f"今晚 · {round(moon.phase)}%"
+            if sday == 23:
+                item['label'] = f"今晚(秋分) · {round(moon.phase)}%"
+            elif sday == 25:
+                item['label'] = f"今晚(中秋) · {round(moon.phase)}%"
+            elif sday == 27:
+                item['label'] = f"今晚(满月) · {round(moon.phase)}%"
+            else:
+                item['label'] = f"今晚 · {round(moon.phase)}%"
+        elif sday == 23:
+            item['label'] = f"秋分 · {round(moon.phase, 1)}%"
         elif sday == 25:
             item['label'] = f"中秋 · {round(moon.phase, 1)}%"
         elif sday == 27:
@@ -241,11 +268,22 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
     l1 = f"今晚 {time_str} · 东部沿海（{lat}°N {lon}°E）· 全天拱极投影 · 星历：pyephem 本地计算"
     l2 = f"月亮：{round(moon_illum)}% 盈凸 · 月龄 {age_d:.1f} 天 · 距离 {moon_dist_km:,.0f} km · 高度 {moon_alt:.1f}°（西南天空） · {moonset_str}"
     l3 = f"土星：东南 {round(sat_alt)}° · {sat.mag:.1f} 等 · 全夜可见 · 夏季大三角过中天 · 银河（人马—天鹅段）斜贯天顶"
+    days_to_midautumn = (datetime.date(2026, 9, 25) - local_dt.date()).days
+    days_to_equinox = (datetime.date(2026, 9, 23) - local_dt.date()).days
+
     if date_str == '2026-09-19':
         l4 = "上弦精确时刻：今日 04:43 · 农历八月初九 · 中秋 09-25，满月时刻却在 09-27 凌晨 00:48（八月十七）"
+    elif date_str == '2026-09-23':
+        l4 = "今日 08:05 秋分（太阳黄经 180° · 昼夜平分）· 距中秋（09-25 望夕）还有 2 天 · 满月 09-27 凌晨 00:48"
+    elif date_str == '2026-09-25':
+        l4 = "农历八月十五 · 今夕中秋望夕（月出东南）· 满月精确时刻在 09-27 凌晨 00:48（十五的月亮十七圆）"
+    elif days_to_midautumn > 0:
+        if days_to_equinox > 0:
+            l4 = f"农历八月{lunar_day_str} · 距中秋（09-25 望夕）还有 {days_to_midautumn} 天 · 距秋分（09-23 08:05）还有 {days_to_equinox} 天 · 满月 09-27 凌晨 00:48"
+        else:
+            l4 = f"农历八月{lunar_day_str} · 距中秋（09-25 望夕）还有 {days_to_midautumn} 天 · 满月精确时刻 09-27 凌晨 00:48（八月十七）"
     else:
-        days_to_midautumn = (datetime.date(2026, 9, 25) - local_dt.date()).days
-        l4 = f"农历八月{lunar_day_str} · 距中秋（09-25 望夕）还有 {days_to_midautumn} 天 · 满月精确时刻 09-27 凌晨 00:48（八月十七）"
+        l4 = f"农历八月{lunar_day_str} · 满月时刻 09-27 凌晨 00:48（八月十七）· 月相渐过极值"
 
     out['panel_lines'] = [
         [l1, 20, 'ink'],

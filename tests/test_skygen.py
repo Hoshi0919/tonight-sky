@@ -86,6 +86,48 @@ class TestSkygen(unittest.TestCase):
         self.assertIn("const DATA =", rendered)
         self.assertIn("2026-09-20", rendered)
 
+    def test_compute_sky_data_2026_09_23_equinox(self):
+        data = skygen.compute_sky_data(date_str="2026-09-23", time_str="22:30")
+        self.assertAlmostEqual(data["moon_t0"]["illum"], 89.8, delta=0.5)
+        self.assertIn("秋分", data.get("title_sub", ""))
+        self.assertIn("八月十三", data.get("title_sub", ""))
+        panel_lines = data.get("panel_lines", [])
+        self.assertEqual(len(panel_lines), 4)
+        self.assertIn("今日 08:05 秋分", panel_lines[3][0])
+        self.assertIn("昼夜平分", panel_lines[3][0])
+        strip = data["phase_strip"]
+        self.assertEqual(len(strip), 5)
+        self.assertEqual(strip[0]["date"], "09-23")
+        self.assertIn("秋分", strip[0]["label"])
+        self.assertEqual(strip[2]["label"], "中秋 · 98.6%")
+        self.assertIn("满月", strip[3]["label"])
+
+    def test_compute_sky_data_2026_09_25_midautumn(self):
+        data = skygen.compute_sky_data(date_str="2026-09-25", time_str="22:30")
+        self.assertAlmostEqual(data["moon_t0"]["illum"], 98.6, delta=0.5)
+        self.assertIn("中秋节 · 望月", data.get("title_sub", ""))
+        self.assertIn("八月十五", data.get("title_sub", ""))
+        panel_lines = data.get("panel_lines", [])
+        self.assertEqual(len(panel_lines), 4)
+        self.assertIn("今夕中秋望夕", panel_lines[3][0])
+        self.assertIn("十五的月亮十七圆", panel_lines[3][0])
+        strip = data["phase_strip"]
+        self.assertEqual(len(strip), 5)
+        self.assertEqual(strip[0]["date"], "09-25")
+        self.assertIn("今晚(中秋)", strip[0]["label"])
+        self.assertIn("满月", strip[2]["label"])
+
+    def test_phase_strip_all_days_consistency(self):
+        for day in range(19, 28):
+            date_str = f"2026-09-{day:02d}"
+            data = skygen.compute_sky_data(date_str=date_str, time_str="22:30")
+            strip = data["phase_strip"]
+            self.assertEqual(len(strip), 5, f"Day {day} phase strip length != 5: {strip}")
+            self.assertEqual(strip[0]["date"], f"09-{day:02d}", f"Day {day} first item mismatch")
+            dates = [item["date"] for item in strip]
+            # Strictly increasing dates
+            self.assertEqual(dates, sorted(list(set(dates))), f"Day {day} dates not strictly ascending")
+
     def test_cli_execution_with_custom_paths(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             out_json = Path(tmpdir) / "custom_sky.json"
