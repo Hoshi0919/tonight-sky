@@ -54,6 +54,20 @@ uv run --with ephem python3 skygen.py --date 2026-09-22 --time 22:30
 
 ## 验证方法（无头 Chrome + browser_exec 像素断言）
 
+导出命令（窗口必须 1280×1810，与 createCanvas 一致，否则右侧被裁）：
+
+```bash
+chrome --headless --disable-gpu --no-sandbox --window-size=1280,1810 \
+  --screenshot=tonight-moon-YYYY-MM-DD.png --hide-scrollbars "file://.../sketch-YYYY-MM-DD.html"
+```
+
+月盘中心每晚随高度/方位移动，计算公式（R=592, CX=640, CY=700，取 m=30 轨迹点）：
+`rr = R*(0.78 - 0.55*alt/90)`，`mx = CX + rr*sin(az-180°)`，`my = CY + rr*cos(az-180°)`。
+
+暗影几何断言用**结构化度量**而非单点采样：沿赤道行扫描受光起点，
+与理论终结线 `x = cx - Rm*(2k-1)` 对齐（容差 ±3px）。单点采样无法发现
+"暗影铺满半盘"这类结构性缺陷（2026-09-22 即漏检一例，见诚实清单）。
+
 用 canvas `getImageData` 在预测坐标读像素，与设计调色盘对照：
 
 | 元素 | 预测坐标 / 判据 | 2026-09-22 实测结果 |
