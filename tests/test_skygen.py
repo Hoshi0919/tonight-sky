@@ -266,5 +266,25 @@ class TestSkygen(unittest.TestCase):
         self.assertIn('drawMoonPhaseDisc', rendered)
         self.assertNotIn('ellipse(Rm * k, 0, shadowW', rendered)
 
+    def test_waxing_shadow_loop_direction_locked(self):
+        """回归锁定：盈月暗影终结线弧必须与外缘弧反向闭合（bottom→top）。
+
+        2026-09-22 曾因终结线循环写成递减（与外缘同向 top→bottom），
+        两条弧同向平行导致暗影铺满整个左半盘（等效 k=0.5），且单点
+        采样验证无法发现。修复后渲染验证：k=0.83/0.898/0.951/0.986
+        的受光起点与理论终结线偏差 ≤1px。
+        """
+        tpl = (DIR / 'sketch_template.html').read_text(encoding='utf-8')
+        # 定位盈月分支（注释「盈月：左半圆为外边缘」之后到亏月分支之前）
+        start = tpl.index('盈月：左半圆为外边缘')
+        seg = tpl[start:tpl.index('亏月：右半圆为外边缘')]
+        # 终结线顶点行
+        term_line = "vertex(-Rm * (2 * k - 1) * Math.cos(phi), Rm * Math.sin(phi));"
+        self.assertIn(term_line, seg)
+        # 终结线循环必须自下而上（i 递增），不得再出现递减循环
+        loop_up = "for (let i = 0; i <= steps; i++)"
+        self.assertIn(loop_up, seg)
+        self.assertNotIn("for (let i = steps; i >= 0; i--)", seg)
+
 if __name__ == "__main__":
     unittest.main()

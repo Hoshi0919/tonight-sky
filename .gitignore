@@ -1,2 +1,5 @@
 __pycache__/
 *.pyc
+# per-date 中间产物（数据与渲染页可由 skygen.py 复现）
+sky-data-2026-*.json
+sketch-2026-*.html

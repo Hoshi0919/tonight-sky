@@ -286,7 +286,8 @@ function drawMoon() {
         const phi = HALF_PI + PI * (i / steps);
         vertex(Rm * Math.cos(phi), Rm * Math.sin(phi));
       }
-      for (let i = steps; i >= 0; i--) {
+      // 终结线自下而上（与外缘反向），正确围出暗影月牙
+      for (let i = 0; i <= steps; i++) {
         const phi = -HALF_PI + PI * (i / steps);
         vertex(-Rm * (2 * k - 1) * Math.cos(phi), Rm * Math.sin(phi));
       }
