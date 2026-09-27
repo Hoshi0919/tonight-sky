@@ -3,23 +3,25 @@
 一幅用本地星历数据画出来的“真实天象”海报生成器。
 支持任意日期/时间/坐标计算，默认呈现东部沿海（31.2°N 121.5°E）夜空。
 
-## 视觉效果（四日渐盈 → 中秋望月）
+## 视觉效果（渐盈至望 · 九日完整月相长卷）
 
-**四日渐盈连续对比**
+**前期渐盈阶段（八月初九至十二）**
 
-| 2026-09-22 (八月十二 · 83.0%) | 2026-09-21 (八月十一 · 75.1%) | 2026-09-20 (八月初十 · 66.3%) | 2026-09-19 (八月初九 · 57.1%) |
+| 2026-09-19 (八月初九 · 57.1%) | 2026-09-20 (八月初十 · 66.3%) | 2026-09-21 (八月十一 · 75.1%) | 2026-09-22 (八月十二 · 83.0%) |
 | :---: | :---: | :---: | :---: |
-| <img src="./tonight-moon-2026-09-22.png" width="190" alt="2026-09-22 Tonight Moon" /> | <img src="./tonight-moon-2026-09-21.png" width="190" alt="2026-09-21 Tonight Moon" /> | <img src="./tonight-moon-2026-09-20.png" width="190" alt="2026-09-20 Tonight Moon" /> | <img src="./tonight-moon-2026-09-19.png" width="190" alt="2026-09-19 Tonight Moon" /> |
+| <img src="./tonight-moon-2026-09-19.png" width="190" alt="2026-09-19 Tonight Moon" /> | <img src="./tonight-moon-2026-09-20.png" width="190" alt="2026-09-20 Tonight Moon" /> | <img src="./tonight-moon-2026-09-21.png" width="190" alt="2026-09-21 Tonight Moon" /> | <img src="./tonight-moon-2026-09-22.png" width="190" alt="2026-09-22 Tonight Moon" /> |
 
-**中秋三连（八月十三 · 十四 · 十五望夕）**
+**中秋与十七圆望月阶段（秋分、中秋至满月）**
 
-| 2026-09-25 (中秋节 · 望月 98.6%) | 2026-09-24 (八月十四 · 95.1%) | 2026-09-23 (八月十三 · 秋分 · 89.8%) |
-| :---: | :---: | :---: |
-| <img src="./tonight-moon-2026-09-25.png" width="190" alt="2026-09-25 Mid-Autumn Full Moon" /> | <img src="./tonight-moon-2026-09-24.png" width="190" alt="2026-09-24 Tonight Moon" /> | <img src="./tonight-moon-2026-09-23.png" width="190" alt="2026-09-23 Equinox Moon" /> |
+| 2026-09-23 (秋分 · 89.8%) | 2026-09-24 (十四 · 95.1%) | 2026-09-25 (中秋 · 98.6%) | 2026-09-26 (既望 · 99.9%) | 2026-09-27 (望日满月 · 98.9%) |
+| :---: | :---: | :---: | :---: | :---: |
+| <img src="./tonight-moon-2026-09-23.png" width="150" alt="2026-09-23 Equinox Moon" /> | <img src="./tonight-moon-2026-09-24.png" width="150" alt="2026-09-24 Tonight Moon" /> | <img src="./tonight-moon-2026-09-25.png" width="150" alt="2026-09-25 Mid-Autumn Full Moon" /> | <img src="./tonight-moon-2026-09-26.png" width="150" alt="2026-09-26 Moon" /> | <img src="./tonight-moon-2026-09-27.png" width="150" alt="2026-09-27 Full Moon" /> |
 
 ## 产物
 
-- `tonight-moon-2026-09-25.png` — 中秋节望月海报（99% 望月 · 农历八月十五）
+- `tonight-moon-2026-09-27.png` — 八月十七望日满月海报（98.9% · 精确满月 00:48 CST）
+- `tonight-moon-2026-09-26.png` — 八月十六既望海报（99.9% 盈顶 · 极近满月）
+- `tonight-moon-2026-09-25.png` — 中秋节望月海报（98.6% · 农历八月十五望夕）
 - `tonight-moon-2026-09-24.png` — 八月十四海报（盈凸月 95.1%）
 - `tonight-moon-2026-09-23.png` — 八月十三·秋分海报（盈凸月 89.8%）
 - `tonight-moon-2026-09-22.png` — 八月十二海报（盈凸月 83.0%）
@@ -29,7 +31,7 @@
 - `sketch.html` — 自包含单文件页（p5.js 1.11.3 CDN + 内嵌数据），浏览器直接打开即可重渲染
 - `sketch_template.html` — 动态模板（含 `__DATA__` 占位符）
 - `sky-data.json` — pyephem 计算的全部天体数据
-- `tests/test_skygen.py` — 16 个单元测试（星历计算、月相推演、秋分/中秋/满月天象、终结线正射投影、五日连续相位条与土星伴月）
+- `tests/` — 23 个测试（涵盖基础星历 `test_skygen.py`、中秋天体力学 `test_mid_autumn.py`、日月同辉推演 `test_coexistence.py`）
 
 ## 数据来源（全部本地实时计算，无网图）
 
@@ -45,11 +47,13 @@
 ## 构建与测试
 
 ```bash
-# 运行单元测试
-uv run --with ephem python3 -m unittest discover -s tests -v
+# 运行全部 23 个单元测试 (pytest)
+.venv/bin/pytest tests/
+# 或者使用 uv 临时注入依赖运行
+uv run --with ephem --with pytest --with lunardate pytest tests/
 
 # 生成指定日期的星历与页面
-uv run --with ephem python3 skygen.py --date 2026-09-22 --time 22:30
+uv run --with ephem python3 skygen.py --date 2026-09-27 --time 22:30
 ```
 
 ## 验证方法（无头 Chrome + browser_exec 像素断言）
