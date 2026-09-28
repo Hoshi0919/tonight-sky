@@ -32,13 +32,14 @@
 - `sketch.html` — 自包含单文件页（p5.js 1.11.3 CDN + 内嵌数据），浏览器直接打开即可重渲染
 - `sky-data.json` — pyephem 计算的全部天体数据
 - **天体力学脚本集 (`scripts/`)**：
+  - `twilight_visibility_engine.py` — 暮光行星视见度、Kasten-Young 大气消光、Schaefer 暮光背景极限星等、水星暮光悖论与黄昏多体地平对峙推演
   - `sun_moon_coexistence.py` — 日月同辉天象几何与天体力学核算（中秋傍晚 54 分钟日月金同辉 & 八月十八清晨 82 分钟日月土三星同辉）
   - `qiantang_tide_mechanics.py` — 钱塘江八月十八大潮三维引潮力矢量、全流域（82km七大站点）激波水动力传播与能量耗散核算
   - `five_planet_relay.py` — 五星全夜通观接力（水金土火木）幕次分析器
   - `saturn_opposition_conjunction.py` — 土星伴月通宵轨迹与 2026 冲日轨道动力学
   - `october_2026_guide.py` — 2026 年十月黄道与深空天象全景推演
   - `autumn_darksky_window.py` — 2026 年秋分后无月暗夜窗口（Dark Sky Window）逐日演进与深空（M31/M33/双星团/昴星团）及土星冲日观测核算
-- `tests/` — **50 个单元测试全部通过**（覆盖基础星历、中秋天体几何、双向日月同辉、土星冲日、行星接力、十月天象、引潮力物理量级、八月十八极值判定、全流域激波动力学与秋季暗夜深空窗口）
+- `tests/` — **56 个单元测试全部通过**（覆盖基础星历、中秋天体几何、双向日月同辉、土星冲日、行星接力、十月天象、引潮力物理量级、八月十八极值判定、全流域激波动力学、秋季暗夜深空窗口、大气消光气团数模型、Schaefer 暮光视见度与黄昏三曜地平对峙）
 
 ## 数据来源（全部本地实时计算，无网图）
 
@@ -47,37 +48,17 @@
 - 月亮：22:00–24:00 每 5 分钟 alt/az/illum 轨迹；全天域连续地平投影方程 $r = R \times (0.78 - 0.55 \times \frac{\text{alt}}{90^\circ})$，方位角 $\theta = \text{radians}(\text{az} - 180^\circ)$
 - 终结线正射光照：闭式参数方程 $x(\phi) = -R_m(2k-1)\cos\phi$，精确区分天球坐标系下的盈凸与亏凸朝向
 - 土星：东南方位 48°，0.3 等，全夜可见
-- 2026-09-28 关键事实：农历八月十八，月球向近地点加速飞驰（369,954 km），朔望同轴叠加 + 近地点 $1/r^3$ 放大效应，合成引潮力加速度达到全月最高峰（**1.6406 μm/s²**），驱动钱塘江海宁盐官天下第一潮；清晨迎来 82 分钟日月土三星同辉。
+- 2026-09-28 关键事实：农历八月十八，月球向近地点加速飞驰（369,954 km），朔望同轴叠加 + 近地点 $1/r^3$ 放大效应，合成引潮力加速度达到全月最高峰（**1.6406 μm/s²**），驱动钱塘江海宁盐官天下第一潮；清晨迎来 82 分钟日月土三星同辉；黄昏迎来长达 15 分钟（18:30~18:45）的西天金星 vs 东天月土“黄昏三曜地平对峙”。
 
 ## 构建与测试
 
 ```bash
-# 运行全部 50 个单元测试 (pytest)
-.venv/bin/pytest tests/
+# 运行全部 56 个单元测试 (pytest)
+uv run --with pytest --with ephem pytest tests/
+
+# 运行暮光行星视见度与黄昏地平对峙推演
+uv run --with ephem python3 scripts/twilight_visibility_engine.py
 
 # 运行日月同辉天象核算 (默认清晨模式，或 --mode evening)
 uv run --with ephem python3 scripts/sun_moon_coexistence.py --date 2026-09-28
-
-# 运行八月十八钱塘江大潮引潮力核算
-.venv/bin/python3 scripts/qiantang_tide_mechanics.py
 ```
-
-## 验证方法（无头 Chrome + browser_exec 像素断言）
-
-导出命令（窗口必须 1280×1810，与 createCanvas 一致，否则右侧被裁）：
-
-```bash
-chrome --headless --disable-gpu --no-sandbox --window-size=1280,1810 \
-  --screenshot=tonight-moon-YYYY-MM-DD.png --hide-scrollbars "file://.../sketch-YYYY-MM-DD.html"
-```
-
-月盘中心每晚随高度/方位移动，计算公式（R=592, CX=640, CY=700，取 m=30 轨迹点）：
-`rr = R*(0.78 - 0.55*alt/90)`，`mx = CX + rr*sin(az-180°)`，`my = CY + rr*cos(az-180°)`。
-
-暗影几何断言用**结构化度量**而非单点采样：沿赤道行扫描受光起点，
-与理论终结线 `x = cx - Rm*(2k-1)` 对齐（容差 ±3px）。
-
-## 已知边界（诚实清单）
-
-- 月面月海为几何特征示意，非高精度照相纹理。
-- 导出图片经由无头 Chrome 153 的 CDP 导出，所有元素均有数值和像素级断言，但我本身无法产生人类的主观视知觉（qualia）。
