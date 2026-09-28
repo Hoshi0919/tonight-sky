@@ -134,8 +134,26 @@ class TestSkygen(unittest.TestCase):
         self.assertIn("今晚(中秋)", strip[0]["label"])
         self.assertIn("满月", strip[2]["label"])
 
+    def test_compute_sky_data_2026_09_28_qiantang_tide(self):
+        data = skygen.compute_sky_data(date_str="2026-09-28", time_str="22:30")
+        self.assertAlmostEqual(data["moon_t0"]["illum"], 95.4, delta=0.5)
+        self.assertFalse(data["moon_t0"]["is_waxing"])
+        self.assertEqual(data["moon_t0"]["phase_short"], "亏凸")
+        self.assertIn("八月十八", data.get("title_sub", ""))
+        self.assertIn("钱塘大潮", data.get("title_sub", ""))
+        self.assertIn("亏凸月", data.get("title_sub", ""))
+        panel_lines = data.get("panel_lines", [])
+        self.assertEqual(len(panel_lines), 4)
+        self.assertIn("钱塘大潮正日", panel_lines[3][0])
+        self.assertIn("1.64 μm/s²", panel_lines[3][0])
+        strip = data["phase_strip"]
+        self.assertEqual(len(strip), 5)
+        self.assertEqual(strip[0]["date"], "09-28")
+        self.assertEqual(strip[0]["label"], "今晚(大潮) · 95%")
+        self.assertFalse(strip[0]["is_waxing"])
+
     def test_phase_strip_all_days_consistency(self):
-        for day in range(19, 28):
+        for day in range(19, 29):
             date_str = f"2026-09-{day:02d}"
             data = skygen.compute_sky_data(date_str=date_str, time_str="22:30")
             strip = data["phase_strip"]

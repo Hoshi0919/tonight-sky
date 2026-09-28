@@ -152,6 +152,13 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
                     '廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十']
     lunar_day_str = chinese_nums[lunar_day - 1] if 1 <= lunar_day <= 30 else f'{lunar_day}日'
     phase_short = get_phase_short(lunar_day, moon_illum)
+    try:
+        from lunardate import LunarDate
+        ld = LunarDate.from_solar_date(local_dt.year, local_dt.month, local_dt.day)
+        lunar_month_names = ['正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '腊']
+        lunar_month_str = ('闰' if ld.is_leap_month else '') + lunar_month_names[ld.month - 1] + '月'
+    except Exception:
+        lunar_month_str = '八月' 
 
     out['moon_t0'] = {
         'alt': round(moon_alt, 2),
@@ -191,17 +198,23 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
         phase_term = '十六夜 · 既望'
     elif lunar_day == 17:
         phase_term = '十七夜 · 望日满月'
+    elif lunar_day == 18:
+        phase_term = '十八夜 · 钱塘大潮 · 亏凸月'
     elif lunar_day < 8:
         phase_term = '蛾眉月'
     elif lunar_day == 8:
         phase_term = '上弦月'
     elif lunar_day < 15:
         phase_term = f'盈凸月（{round(moon_illum)}%）'
+    elif lunar_day < 22:
+        phase_term = f'亏凸月（{round(moon_illum)}%）'
+    elif lunar_day in (22, 23):
+        phase_term = '下弦月'
     else:
-        phase_term = f'盈凸月（月龄 {age_d:.1f} 天）'
+        phase_term = f'残月（{round(moon_illum)}%）'
 
     out['title_main'] = '今晚的月亮'
-    out['title_sub'] = f"{date_str} · 农历八月{lunar_day_str} · {phase_term}"
+    out['title_sub'] = f"{date_str} · 农历{lunar_month_str}{lunar_day_str} · {phase_term}"
     out['moon_label'] = f"月亮 · {round(moon_illum)}% {phase_short}"
     if moon_alt < 0:
         out['moon_alt_az_text'] = f"地平线下（高度 {moon_alt:.1f}° · {moon_az_zh}方向）"
@@ -300,6 +313,8 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
                 item['label'] = f"今晚(中秋) · {round(moon.phase)}%"
             elif sday == 27:
                 item['label'] = f"今晚(满月) · {round(moon.phase)}%"
+            elif sday == 28 and s_date.month == 9:
+                item['label'] = f"今晚(大潮) · {round(moon.phase)}%"
             else:
                 item['label'] = f"今晚 · {round(moon.phase)}%"
         elif sday == 23:
@@ -331,13 +346,15 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
         l4 = "今日 08:05 秋分（太阳黄经 180° · 昼夜平分）· 距中秋（09-25 望夕）还有 2 天 · 满月 09-27 凌晨 00:48"
     elif date_str == '2026-09-25':
         l4 = "农历八月十五 · 今夕中秋望夕（月出东南）· 满月精确时刻在 09-27 凌晨 00:48（十五的月亮十七圆）"
+    elif date_str == '2026-09-28':
+        l4 = "农历八月十八 · 钱塘大潮正日（全月引潮力极值 1.64 μm/s²）· 望后亏凸月 · 满月时刻 09-27 凌晨 00:48"
     elif days_to_midautumn > 0:
         if days_to_equinox > 0:
-            l4 = f"农历八月{lunar_day_str} · 距中秋（09-25 望夕）还有 {days_to_midautumn} 天 · 距秋分（09-23 08:05）还有 {days_to_equinox} 天 · 满月 09-27 凌晨 00:48"
+            l4 = f"农历{lunar_month_str}{lunar_day_str} · 距中秋（09-25 望夕）还有 {days_to_midautumn} 天 · 距秋分（09-23 08:05）还有 {days_to_equinox} 天 · 满月 09-27 凌晨 00:48"
         else:
-            l4 = f"农历八月{lunar_day_str} · 距中秋（09-25 望夕）还有 {days_to_midautumn} 天 · 满月精确时刻 09-27 凌晨 00:48（八月十七）"
+            l4 = f"农历{lunar_month_str}{lunar_day_str} · 距中秋（09-25 望夕）还有 {days_to_midautumn} 天 · 满月精确时刻 09-27 凌晨 00:48（八月十七）"
     else:
-        l4 = f"农历八月{lunar_day_str} · 满月时刻 09-27 凌晨 00:48（八月十七）· 月相渐过极值"
+        l4 = f"农历{lunar_month_str}{lunar_day_str} · 满月已过（09-27 00:48）· 下次朔月 10-10 23:50 · 月相渐亏"
 
     out['panel_lines'] = [
         [l1, 20, 'ink'],
