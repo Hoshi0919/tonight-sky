@@ -10,6 +10,7 @@ from qiantang_tide_mechanics import (
     vec_sub, vec_add, vec_scale, vec_dot, vec_mag,
     compute_tide_at_time, compute_diurnal_curve,
     compute_multiday_peaks, analyze_qiantang_bore_2026,
+    compute_estuary_propagation, ESTUARY_STATIONS,
     TZ_CST
 )
 
@@ -71,3 +72,40 @@ def test_yanguan_bore_windows():
     types = [w["bore_type"] for w in windows]
     assert any("夜潮" in t for t in types)
     assert any("日潮" in t for t in types)
+
+
+def test_estuary_propagation_structure():
+    prop = compute_estuary_propagation("2026-09-28 13:25")
+    assert len(prop) == 7
+    # 距离单调递增
+    kms = [s["river_km"] for s in prop]
+    assert kms == sorted(kms)
+    assert kms[0] == 0.0
+    assert kms[-1] == 82.0
+    
+    # 抵达时间单调递增
+    times = [s["estimated_arrival_cst"] for s in prop]
+    assert times == sorted(times)
+    assert "13:25" in prop[2]["estimated_arrival_cst"]  # 盐官精准落在 13:25
+
+
+def test_estuary_hydrodynamics_physics():
+    prop = compute_estuary_propagation("2026-09-28 13:25")
+    
+    # 波速在合理物理范围 (25 ~ 35 km/h)
+    for s in prop:
+        assert 25.0 <= s["bore_speed_kmh"] <= 35.0
+        assert s["dissipation_mw"] > 0.0
+    
+    # 盐官站应为全流域弗劳德数与能量耗散巅峰 (激波强度最大)
+    yanguan = prop[2]
+    assert yanguan["id"] == "yanguan"
+    assert yanguan["froude_number"] > 1.5
+    assert "破碎涌潮" in yanguan["shock_type"]
+    assert yanguan["dissipation_mw"] > 100.0  # 超过 100 兆瓦耗散
+    
+    # 杭州市区站水深增加，弗劳德数应回落转为波状涌潮 (Undular Bore)
+    hangzhou = prop[-1]
+    assert hangzhou["id"] == "qiantang_bridge"
+    assert hangzhou["froude_number"] < 1.25
+    assert "波状涌潮" in hangzhou["shock_type"]

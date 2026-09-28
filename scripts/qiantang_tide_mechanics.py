@@ -206,6 +206,137 @@ def compute_multiday_peaks(
     return peaks
 
 
+ESTUARY_STATIONS = [
+    {
+        "id": "dajianshan",
+        "name_zh": "大尖山",
+        "name_en": "Dajianshan",
+        "river_km": 0.0,
+        "channel_width_km": 15.0,
+        "undisturbed_depth_m": 5.5,
+        "bore_height_m": 1.1,
+        "phenomenon": "起潮与汇聚",
+        "optical_feature": "东潮南潮分立，潮头初显，喇叭口潮浪急聚",
+        "base_offset_min": -65
+    },
+    {
+        "id": "dingqiao",
+        "name_zh": "丁桥 (梁家墩)",
+        "name_en": "Dingqiao",
+        "river_km": 18.0,
+        "channel_width_km": 6.5,
+        "undisturbed_depth_m": 4.0,
+        "bore_height_m": 1.8,
+        "phenomenon": "交叉潮 (Cross Bore)",
+        "optical_feature": "东湖南潮十字相撞，X形交叉水脊腾空数十米",
+        "base_offset_min": -40
+    },
+    {
+        "id": "yanguan",
+        "name_zh": "海宁盐官",
+        "name_en": "Haining Yanguan",
+        "river_km": 30.0,
+        "channel_width_km": 2.5,
+        "undisturbed_depth_m": 3.0,
+        "bore_height_m": 2.4,
+        "phenomenon": "一线潮 (One-Line Bore)",
+        "optical_feature": "素练横江，万马奔腾，数米直立滚雪白浪",
+        "base_offset_min": 0
+    },
+    {
+        "id": "laoyancang",
+        "name_zh": "老盐仓",
+        "name_en": "Laoyancang",
+        "river_km": 42.0,
+        "channel_width_km": 2.0,
+        "undisturbed_depth_m": 3.2,
+        "bore_height_m": 2.0,
+        "phenomenon": "回头潮 (Reflected Bore)",
+        "optical_feature": "怒撼 660 米百丈巨坝，折返东冲与后浪剧烈搏击",
+        "base_offset_min": 25
+    },
+    {
+        "id": "meinvba",
+        "name_zh": "美女坝 (萧山)",
+        "name_en": "Meinvba",
+        "river_km": 54.0,
+        "channel_width_km": 1.8,
+        "undisturbed_depth_m": 3.5,
+        "bore_height_m": 1.6,
+        "phenomenon": "回头潮与冲天潮",
+        "optical_feature": "盘头折浪，水击石塘腾空万重雪",
+        "base_offset_min": 50
+    },
+    {
+        "id": "qibao_sanbao",
+        "name_zh": "七堡 · 三堡 (杭州)",
+        "name_en": "Qibao / Sanbao",
+        "river_km": 68.0,
+        "channel_width_km": 1.5,
+        "undisturbed_depth_m": 4.5,
+        "bore_height_m": 1.1,
+        "phenomenon": "波纹潮 (Undular Bore)",
+        "optical_feature": "水深增加 Fr<1.25，激波转为层层波浪鳞纹与游龙潮",
+        "base_offset_min": 85
+    },
+    {
+        "id": "qiantang_bridge",
+        "name_zh": "钱塘江大桥 (闻涛路)",
+        "name_en": "Qiantang River Bridge",
+        "river_km": 82.0,
+        "channel_width_km": 1.2,
+        "undisturbed_depth_m": 5.0,
+        "bore_height_m": 0.6,
+        "phenomenon": "平息涌潮 (Attenuated Bore)",
+        "optical_feature": "余威过杭城核心区，波光浩渺平缓入江",
+        "base_offset_min": 115
+    }
+]
+
+
+def compute_estuary_propagation(yanguan_time_str: str = "2026-09-28 13:25") -> List[Dict[str, Any]]:
+    """基于浅水激波流体力学推演钱塘江全流域（82公里）涌潮空间传播。"""
+    ref_dt = datetime.datetime.strptime(yanguan_time_str, "%Y-%m-%d %H:%M").replace(tzinfo=TZ_CST)
+    g = 9.81
+    rho = 1025.0  # kg/m^3 (钱塘江感潮河段微咸水密度)
+    
+    results = []
+    for s in ESTUARY_STATIONS:
+        h0 = s["undisturbed_depth_m"]
+        dh = s["bore_height_m"]
+        h1 = h0 + dh
+        c0 = math.sqrt(g * h0)
+        # 瑞利激波关系式 (Rayleigh hydraulic jump wave speed)
+        vb = math.sqrt(g * h1 * (h1 + h0) / (2.0 * h0))
+        fr = vb / c0
+        shock_type = "破碎涌潮 (Breaking Bore)" if fr >= 1.25 else "波状涌潮 (Undular Bore)"
+        
+        # 激波水头损失与能量耗散率 (Watts/m)
+        diss_w_m = 0.25 * rho * g * vb * (dh ** 3) / h1
+        total_diss_mw = (diss_w_m * s["channel_width_km"] * 1000.0) / 1e6
+        
+        arr_dt = ref_dt + datetime.timedelta(minutes=s["base_offset_min"])
+        
+        results.append({
+            "id": s["id"],
+            "station": f"{s['name_zh']} ({s['name_en']})",
+            "river_km": s["river_km"],
+            "estimated_arrival_cst": arr_dt.strftime("%Y-%m-%d %H:%M"),
+            "channel_width_km": s["channel_width_km"],
+            "depth_pre_bore_m": h0,
+            "bore_height_m": dh,
+            "shallow_wave_speed_ms": round(c0, 2),
+            "bore_speed_ms": round(vb, 2),
+            "bore_speed_kmh": round(vb * 3.6, 1),
+            "froude_number": round(fr, 2),
+            "shock_type": shock_type,
+            "dissipation_mw": round(total_diss_mw, 1),
+            "phenomenon": s["phenomenon"],
+            "optical_feature": s["optical_feature"]
+        })
+    return results
+
+
 def analyze_qiantang_bore_2026() -> Dict[str, Any]:
     """钱塘江大潮（2026年八月十八）全要素天体物理与水动力综合研判。"""
     # 1. 2026-09-28 24小时逐时数据 (步长 30 分钟)
@@ -248,6 +379,7 @@ def analyze_qiantang_bore_2026() -> Dict[str, Any]:
         "multiday_trend": multiday,
         "diurnal_curve": diurnal,
         "yanguan_windows": yanguan_bore_windows,
+        "estuary_propagation": compute_estuary_propagation("2026-09-28 13:25"),
         "mechanics_summary": {
             "朔望叠加 (Syzygy)": "农历八月十七 00:48 发生天文精确望，日月近乎同轴（夹角 ~174°），日、月引潮力合成 Spring Tide（大潮）。",
             "近地点轨道加速 (Perigee Boost)": "月球轨道正向 10-02 近地点加速运行（自 40.5 万公里逼近至 36.9 万公里），因引潮力严格反比于距离立方 1/r³，近地点推进效应使引潮力峰值由十五/十七后移，并在八月十八（09-28）达到全月最高峰（1.6406 μm/s²）！",
@@ -284,6 +416,21 @@ def format_report(analysis: Dict[str, Any]) -> str:
         lines.append(f"• {w['bore_type']}：预计到达 {w['estimated_arrival_cst']} CST")
         lines.append(f"  - 天象背景：{w['celestial_context']}")
         lines.append(f"  - 景观特征：{w['visual_character']}")
+    lines.append("")
+    lines.append("【八月十八钱塘江日潮全流域空间传播与水动力激波演化】")
+    lines.append(" 观测站点                     | 预计抵达 | 里程(km) | 潮高(m) | 波速(km/h) | 弗劳德数 Fr | 激波形态         | 耗散功率")
+    lines.append("------------------------------+----------+----------+---------+------------+-------------+------------------+---------")
+    for s in analysis.get("estuary_propagation", []):
+        t_short = s["estimated_arrival_cst"].split(" ")[1]
+        mark = " ★" if "盐官" in s["station"] else "  "
+        lines.append(
+            f" {s['station']:<28} | {t_short:<8} | {s['river_km']:>8.1f} | {s['bore_height_m']:>7.1f} | {s['bore_speed_kmh']:>10.1f} | {s['froude_number']:>9.2f}{mark} | {s['shock_type'].split(' ')[0]:<16} | {s['dissipation_mw']:>7.1f} MW"
+        )
+    lines.append("")
+    lines.append("【主要观潮点激波景观特征】")
+    for s in analysis.get("estuary_propagation", []):
+        lines.append(f"• {s['station']} ({s['phenomenon']})：")
+        lines.append(f"    {s['optical_feature']} (Fr={s['froude_number']}, 潮高 {s['bore_height_m']}m)")
     lines.append("")
     lines.append("【四重动力学汇聚机制】")
     for k, v in analysis["mechanics_summary"].items():
