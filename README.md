@@ -38,8 +38,9 @@
   - `five_planet_relay.py` — 五星全夜通观接力（水金土火木）幕次分析器
   - `saturn_opposition_conjunction.py` — 土星伴月通宵轨迹与 2026 冲日轨道动力学
   - `october_2026_guide.py` — 2026 年十月黄道与深空天象全景推演
+  - `pleiades_occultation_2026.py` — 2026 年国庆子夜月掩昴星团 (M45) 全域天体力学核算、华夏 18 节点掩食接触、南缘掠掩带精确求解与暗边复出视差推演
   - `autumn_darksky_window.py` — 2026 年秋分后无月暗夜窗口（Dark Sky Window）逐日演进与深空（M31/M33/双星团/昴星团）及土星冲日观测核算
-- `tests/` — **56 个单元测试全部通过**（覆盖基础星历、中秋天体几何、双向日月同辉、土星冲日、行星接力、十月天象、引潮力物理量级、八月十八极值判定、全流域激波动力学、秋季暗夜深空窗口、大气消光气团数模型、Schaefer 暮光视见度与黄昏三曜地平对峙）
+- `tests/` — **63 个单元测试全部通过**（覆盖基础星历、中秋天体几何、双向日月同辉、土星冲日、行星接力、十月天象、引潮力物理量级、八月十八极值判定、全流域激波动力学、秋季暗夜深空窗口、大气消光气团数模型、Schaefer 暮光视见度与黄昏三曜地平对峙、国庆子夜月掩昴星团与华夏掠掩带单调性）
 
 ## 数据来源（全部本地实时计算，无网图）
 
@@ -53,7 +54,7 @@
 ## 构建与测试
 
 ```bash
-# 运行全部 56 个单元测试 (pytest)
+# 运行全部 63 个单元测试 (pytest)
 uv run --with pytest --with ephem pytest tests/
 
 # 运行暮光行星视见度与黄昏地平对峙推演
@@ -61,4 +62,7 @@ uv run --with ephem python3 scripts/twilight_visibility_engine.py
 
 # 运行日月同辉天象核算 (默认清晨模式，或 --mode evening)
 uv run --with ephem python3 scripts/sun_moon_coexistence.py --date 2026-09-28
+
+# 运行国庆子夜月掩昴星团全域推演与华夏掠掩带求解
+uv run --with ephem python3 scripts/pleiades_occultation_2026.py
 ```
