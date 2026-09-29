@@ -11,14 +11,15 @@
 | :---: | :---: | :---: | :---: |
 | <img src="./tonight-moon-2026-09-19.png" width="190" alt="2026-09-19 Tonight Moon" /> | <img src="./tonight-moon-2026-09-20.png" width="190" alt="2026-09-20 Tonight Moon" /> | <img src="./tonight-moon-2026-09-21.png" width="190" alt="2026-09-21 Tonight Moon" /> | <img src="./tonight-moon-2026-09-22.png" width="190" alt="2026-09-22 Tonight Moon" /> |
 
-**中秋、满月与十八大潮阶段（秋分、中秋、既望、满月至大潮）**
+**中秋、满月、大潮至望后渐亏阶段（秋分、中秋、既望、满月、十八大潮至十九亏凸）**
 
-| 2026-09-23 (秋分 · 89.8%) | 2026-09-24 (十四 · 95.1%) | 2026-09-25 (中秋 · 98.6%) | 2026-09-26 (既望 · 99.9%) | 2026-09-27 (望日满月 · 98.9%) | 2026-09-28 (十八大潮 · 95.4%) |
-| :---: | :---: | :---: | :---: | :---: | :---: |
-| <img src="./tonight-moon-2026-09-23.png" width="130" alt="2026-09-23 Equinox Moon" /> | <img src="./tonight-moon-2026-09-24.png" width="130" alt="2026-09-24 Tonight Moon" /> | <img src="./tonight-moon-2026-09-25.png" width="130" alt="2026-09-25 Mid-Autumn Full Moon" /> | <img src="./tonight-moon-2026-09-26.png" width="130" alt="2026-09-26 Moon" /> | <img src="./tonight-moon-2026-09-27.png" width="130" alt="2026-09-27 Full Moon" /> | <img src="./tonight-moon-2026-09-28.png" width="130" alt="2026-09-28 Qiantang Tide Moon" /> |
+| 2026-09-23 (秋分 · 89.8%) | 2026-09-24 (十四 · 95.1%) | 2026-09-25 (中秋 · 98.6%) | 2026-09-26 (既望 · 99.9%) | 2026-09-27 (满月 · 98.9%) | 2026-09-28 (大潮 · 95.4%) | 2026-09-29 (十九 · 89.5%) |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| <img src="./tonight-moon-2026-09-23.png" width="110" alt="2026-09-23 Equinox Moon" /> | <img src="./tonight-moon-2026-09-24.png" width="110" alt="2026-09-24 Tonight Moon" /> | <img src="./tonight-moon-2026-09-25.png" width="110" alt="2026-09-25 Mid-Autumn Full Moon" /> | <img src="./tonight-moon-2026-09-26.png" width="110" alt="2026-09-26 Moon" /> | <img src="./tonight-moon-2026-09-27.png" width="110" alt="2026-09-27 Full Moon" /> | <img src="./tonight-moon-2026-09-28.png" width="110" alt="2026-09-28 Qiantang Tide Moon" /> | <img src="./tonight-moon-2026-09-29.png" width="110" alt="2026-09-29 Tonight Moon" /> |
 
 ## 产物与天体动力学套件
 
+- `tonight-moon-2026-09-29.png` — 八月十九亏凸月海报（89.5% 亏凸月 · 望后渐亏阶段）
 - `tonight-moon-2026-09-28.png` — 八月十八钱塘大潮夜海报（95.4% 亏凸月 · 全月引潮力极值 1.64 μm/s²）
 - `tonight-moon-2026-09-27.png` — 八月十七望日满月海报（98.9% · 精确满月 00:48 CST）
 - `tonight-moon-2026-09-26.png` — 八月十六既望海报（99.9% 盈顶 · 极近满月）
@@ -44,7 +45,7 @@
   - `october_2026_guide.py` — 2026 年十月黄道与深空天象全景推演
   - `pleiades_occultation_2026.py` — 2026 年国庆子夜月掩昴星团 (M45) 全域天体力学核算、华夏 18 节点掩食接触、南缘掠掩带精确求解与暗边复出视差推演
   - `autumn_darksky_window.py` — 2026 年秋分后无月暗夜窗口（Dark Sky Window）逐日演进与深空（M31/M33/双星团/昴星团）及土星冲日观测核算
-- `tests/` — **94 个单元测试全部通过**（覆盖基础星历、中秋天体几何、双向日月同辉、土星冲日与塞利格浪涌、金星下合与大气光环、十月双流星雨轨道动力学与月光压制反弹模型、灶神星冲日动力学与原行星自转测光模型、行星接力、十月天象、引潮力物理量级、八月十八极值判定、全流域激波动力学、秋季暗夜深空窗口、大气消光气团数模型、Schaefer 暮光视见度与黄昏三曜地平对峙、国庆子夜月掩昴星团与华夏掠掩带单调性）
+- `tests/` — **102 个单元测试全部通过**（覆盖基础星历、中秋天体几何、双向日月同辉、土星冲日与塞利格浪涌、金星下合与大气光环、十月双流星雨轨道动力学与月光压制反弹模型、灶神星冲日动力学与原行星自转测光模型、行星接力、十月天象、引潮力物理量级、八月十八极值判定、全流域激波动力学、秋季暗夜深空窗口、大气消光气团数模型、Schaefer 暮光视见度与黄昏三曜地平对峙、国庆子夜月掩昴星团与华夏掠掩带单调性）
 
 ## 数据来源（全部本地实时计算，无网图）
 
@@ -58,8 +59,11 @@
 ## 构建与测试
 
 ```bash
-# 运行全部 94 个单元测试 (pytest)
+# 运行全部 102 个单元测试 (pytest)
 uv run --with pytest --with ephem pytest tests/
+
+# 运行火星穿行鬼宿星团 (M44) 动力学推演与观象引擎
+uv run --with ephem python3 scripts/mars_m44_praesepe_engine.py
 
 # 运行 4 号灶神星冲日天体力学推演与原行星自转测光引擎
 uv run --with ephem python3 scripts/vesta_opposition_engine.py
