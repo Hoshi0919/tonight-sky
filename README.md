@@ -32,6 +32,7 @@
 - `sketch.html` — 自包含单文件页（p5.js 1.11.3 CDN + 内嵌数据），浏览器直接打开即可重渲染
 - `sky-data.json` — pyephem 计算的全部天体数据
 - **天体力学脚本集 (`scripts/`)**：
+  - `meteor_shower_dynamics_engine.py` — 2026 年十月双流星雨天体动力学与天幕辐射对比引擎：天龙座（Draconids 21P 顺行追赶 20.4 km/s 超慢速、中温 Na/Fe 琥珀金流星、农历廿八 3.5% 月相全夜 0.0% 月光暗夜天窗、北纬 36° 以北恒显圈傍晚即达最高仰角）vs 猎户座（Orionids 1P 逆行迎面对撞 66.0 km/s 极速电离绿白流星、盈凸月 77% 前半夜压制与 01:46 CST 月落后黄金窗口）、Whipple 流星烧蚀动能微分与 Schaefer 极限星等 (NELM) 衰减模型、全国五大节点逐时积分解算
   - `venus_inferior_conjunction_engine.py` — 2026 年金星下合与大气光环动力学引擎：留点解算（10-02 顺转逆，11-12 逆转顺）、最近地距（0.2729 AU）、视径之冠（62.00"）、罗素模型（Russell 1899）与高层硫酸雾霾米氏前向散射蛾眉尖端延伸（Cusp Extension）/ 完整闭合光环推演、晨昏翻转、中国五大节点正午中天与白昼建筑遮阳安全观测几何
   - `saturn_opposition_engine.py` — 2026 年土星冲日与塞利格冲日浪涌（Seeliger Opposition Surge）双峰辐射传输模型、光环重新展开倾角（-7.6°）解算、五大主卫星视平面投影与中国五大城市通宵观测窗口
   - `twilight_visibility_engine.py` — 暮光行星视见度、Kasten-Young 大气消光、Schaefer 暮光背景极限星等、水星暮光悖论与黄昏多体地平对峙推演
@@ -42,7 +43,7 @@
   - `october_2026_guide.py` — 2026 年十月黄道与深空天象全景推演
   - `pleiades_occultation_2026.py` — 2026 年国庆子夜月掩昴星团 (M45) 全域天体力学核算、华夏 18 节点掩食接触、南缘掠掩带精确求解与暗边复出视差推演
   - `autumn_darksky_window.py` — 2026 年秋分后无月暗夜窗口（Dark Sky Window）逐日演进与深空（M31/M33/双星团/昴星团）及土星冲日观测核算
-- `tests/` — **79 个单元测试全部通过**（覆盖基础星历、中秋天体几何、双向日月同辉、土星冲日与塞利格浪涌、金星下合与大气光环、行星接力、十月天象、引潮力物理量级、八月十八极值判定、全流域激波动力学、秋季暗夜深空窗口、大气消光气团数模型、Schaefer 暮光视见度与黄昏三曜地平对峙、国庆子夜月掩昴星团与华夏掠掩带单调性）
+- `tests/` — **86 个单元测试全部通过**（覆盖基础星历、中秋天体几何、双向日月同辉、土星冲日与塞利格浪涌、金星下合与大气光环、十月双流星雨轨道动力学与月光压制反弹模型、行星接力、十月天象、引潮力物理量级、八月十八极值判定、全流域激波动力学、秋季暗夜深空窗口、大气消光气团数模型、Schaefer 暮光视见度与黄昏三曜地平对峙、国庆子夜月掩昴星团与华夏掠掩带单调性）
 
 ## 数据来源（全部本地实时计算，无网图）
 
@@ -56,8 +57,11 @@
 ## 构建与测试
 
 ```bash
-# 运行全部 79 个单元测试 (pytest)
+# 运行全部 86 个单元测试 (pytest)
 uv run --with pytest --with ephem pytest tests/
+
+# 运行十月双流星雨天体动力学与天幕辐射对比引擎
+uv run --with ephem python3 scripts/meteor_shower_dynamics_engine.py --city Shanghai
 
 # 运行金星下合与大气光环动力学综合推演
 uv run --with ephem python3 scripts/venus_inferior_conjunction_engine.py
