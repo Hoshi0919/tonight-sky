@@ -353,8 +353,23 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
             l4 = f"农历{lunar_month_str}{lunar_day_str} · 距中秋（09-25 望夕）还有 {days_to_midautumn} 天 · 距秋分（09-23 08:05）还有 {days_to_equinox} 天 · 满月 09-27 凌晨 00:48"
         else:
             l4 = f"农历{lunar_month_str}{lunar_day_str} · 距中秋（09-25 望夕）还有 {days_to_midautumn} 天 · 满月精确时刻 09-27 凌晨 00:48（八月十七）"
-    else:
+    elif local_dt.date() < datetime.date(2026, 10, 10):
         l4 = f"农历{lunar_month_str}{lunar_day_str} · 满月已过（09-27 00:48）· 下次朔月 10-10 23:50 · 月相渐亏"
+    elif date_str == '2026-10-10':
+        l4 = "今日 23:50 朔日新月（农历九月初一）· 纯黑无月深空黄金窗口开启"
+    elif date_str == '2026-10-11':
+        l4 = "农历九月初二 · 极纤细蛾眉月 · 今夜 21:11 荧惑入鬼宿犯积尸气（最小角距 4.82'）"
+    elif date_str == '2026-10-12':
+        l4 = "农历九月初三 · 4% 蛾眉月 · 明晨 4号灶神星冲日（10-13 06:40 · 6.4等 · 全夜无月纯黑天窗）"
+    elif date_str == '2026-10-13':
+        l4 = "今日 06:40 4号灶神星冲日（6.39等 · 1.48 AU）· 农历九月初四 · 9% 蛾眉月入夜即沉"
+    else:
+        days_to_fm = (datetime.date(2026, 10, 26) - local_dt.date()).days
+        if days_to_fm > 0:
+            days_to_ori = (datetime.date(2026, 10, 21) - local_dt.date()).days
+            l4 = f"农历{lunar_month_str}{lunar_day_str} · 蛾眉渐盈 · 距猎户座流星雨极盛（10-21）还有 {days_to_ori} 天 · 距近地超级满月（10-26）还有 {days_to_fm} 天"
+        else:
+            l4 = f"农历{lunar_month_str}{lunar_day_str} · 10-26 年度近地超级满月 · 月相渐亏"
 
     out['panel_lines'] = [
         [l1, 20, 'ink'],
