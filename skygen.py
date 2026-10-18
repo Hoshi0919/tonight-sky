@@ -365,6 +365,8 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
         l4 = "今日 06:40 4号灶神星冲日（6.39等 · 1.48 AU）· 农历九月初四 · 9% 蛾眉月入夜即沉"
     elif date_str == '2026-10-18':
         l4 = "农历九月初九 · 重阳节 · 旅行者2号今日跨越20光时大关 · 距猎户座流星雨3天 · 超级满月8天"
+    elif date_str == '2026-10-19':
+        l4 = "农历九月初十 · 盈凸月 · ExoMars TGO 入轨十周年整 · 距猎户座流星雨2天 · 超级满月7天"
     else:
         days_to_fm = (datetime.date(2026, 10, 26) - local_dt.date()).days
         if days_to_fm > 0:

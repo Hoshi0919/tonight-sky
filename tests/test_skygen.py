@@ -18,6 +18,19 @@ import skygen
 
 @unittest.skipUnless(HAS_EPHEM, "ephem is required for skygen tests")
 class TestSkygen(unittest.TestCase):
+    def test_compute_sky_data_2026_10_19(self):
+        data = skygen.compute_sky_data(date_str="2026-10-19", time_str="22:30")
+        self.assertAlmostEqual(data["moon_t0"]["illum"], 59.0, delta=0.5)
+        self.assertAlmostEqual(data["moon_t0"]["alt"], 13.41, delta=0.5)
+        self.assertIn("2026-10-19 23:49", data["moonset_local"])
+        self.assertIn("九月初十", data.get("title_sub", ""))
+        self.assertIn("2026-10-19", data.get("title_sub", ""))
+        panel_lines = data.get("panel_lines", [])
+        self.assertEqual(len(panel_lines), 4)
+        self.assertIn("ExoMars TGO 入轨十周年整", panel_lines[3][0])
+        self.assertIn("距猎户座流星雨2天", panel_lines[3][0])
+        self.assertIn("超级满月7天", panel_lines[3][0])
+
     def test_compute_sky_data_2026_09_19(self):
         data = skygen.compute_sky_data(date_str="2026-09-19", time_str="22:30")
         self.assertIn("stars", data)
