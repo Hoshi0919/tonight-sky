@@ -19,7 +19,7 @@
 
 ## 产物与天体动力学套件
 
-- `tonight-moon-2026-10-18.png` — 农历九月初九重阳节盈凸月海报（40.8%~49% 照亮 · 火星快车号 Mars Express 23 载在轨动力学、MARSIS 超低频穿地雷达 5km 剖面与南极冰下湖异常、火卫一 Phobos 轨道相交 45km 极近飞掠测地学确证碎石堆、OMEGA 水成三大地质纪元、HRSC 9 通道推扫 3D 全图与 2026 人类深空二十六极黄金舰队 The Grand Hexavigintet 全景推演 · 旅行者 2 号于今日凌晨 00:17 CST 正式突破 20 光时星际大关 · 距 10-21 猎户座流星雨极盛 3 天 · 距 10-26 近地超级满月 8 天 · 22:51 月落后通宵零月光纯黑暗空）
+- `tonight-moon-2026-10-18.png` — 农历九月初九重阳节盈凸月海报（40.8%~49% 照亮 · 旅行者 2 号今日凌晨 00:17 CST 正式突破 20 光时星际大关 · 火星快车号/奥德赛号/ExoMars TGO/MAVEN/希望号火星九极联动 · 月球现役六大金刚 The Lunar Hexad 与 2026 人类深空三十四极黄金舰队 The Grand Quattuortrigintet 全景推演 · 距 10-21 猎户座流星雨极盛 3 天 · 距 10-26 近地超级满月 8 天 · 22:51 月落后通宵零月光纯黑暗空）
 - `tonight-moon-2026-10-17.png` — 农历九月初八上弦月海报（39.0% 照亮 · 日地关系天文台 STEREO-A 20 周年日心超前漂移轨道天体力学、CME 3D 立体视觉重构、太阳远背面 5.2 天超前预警、SECCHI 空间光学与 2026 人类深空二十五极黄金舰队 The Grand Quinvigintet 全景推演 · 旅行者 2 号 20 光时终极跨越今晚 4 小时后准时冲线 · 距 10-21 猎户座流星雨极盛 4 天 · 距 10-26 近地超级满月 9 天 · 21:54 月落后通宵零月光纯黑暗空）
 - `tonight-moon-2026-10-16.png` — 农历九月初七蛾眉月海报（31.0% 照亮 · 太阳轨道飞行器 Solar Orbiter 黄道外极区发电机动力学、520°C 骨黑热障与 2026 人类深空十五极黄金舰队 The Grand Sedecet 全景推演 · 倒计时 69 天平安夜迎来 VGA5 开启 24° 极区新时代 · 距 10-21 猎户座流星雨极盛 5 天 · 距 10-26 近地超级满月 10 天 · 通宵零月光纯黑暗空）
 - `tonight-moon-2026-10-15.png` — 农历九月初六蛾眉月海报（22.7% 照亮 · 詹姆斯·韦伯望远镜 JWST 日地 L2 晕轨道天体力学、极寒隔热与 2026 深空七极黄金舰队全景推演 · 今日赫拉号 BRM-1 主减速点火 · 距 10-21 猎户座流星雨极盛 6 天 · 通宵零月光纯黑暗空）
@@ -163,6 +163,9 @@ python3 scripts/mars_express_subsurface_phobos_engine.py
 # 运行 MAVEN、希望号、火星九极与深空三十极黄金舰队推演引擎
 python3 scripts/maven_hope_martian_nonet_engine.py
 
-# 运行全部 433 个单元测试 (pytest)
+# 运行月球现役六大金刚与深空三十四极黄金舰队推演引擎
+python3 scripts/lunar_hexad_cislunar_fleet_engine.py
+
+# 运行全部 442 个单元测试 (pytest)
 uv run --with pytest --with ephem --with lunardate pytest tests/
 ```
