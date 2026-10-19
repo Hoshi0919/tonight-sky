@@ -374,7 +374,7 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
     elif date_str == '2026-10-19':
         l4 = "农历九月初十 · 盈凸月 · TGO十周年·IBEX十八载·ESCAPADE五十极半百黄金舰队·距猎户座流星雨2天"
     elif date_str == '2026-10-20':
-        l4 = "农历九月十一 · 盈凸月 · BepiColombo八载铸剑水星倒计时32天·OSIRIS-REx触碰采样六周年·距猎户座流星雨极大1天"
+        l4 = "农历九月十一 · 盈凸月 · 今日MMX火卫一采样破晓启航 · BepiColombo八载铸剑水星倒计时32天·OSIRIS-REx触碰采样六周年·距猎户座流星雨极大1天"
     else:
         days_to_fm = (datetime.date(2026, 10, 26) - local_dt.date()).days
         if days_to_fm > 0:

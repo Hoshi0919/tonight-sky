@@ -31,6 +31,7 @@ class TestSkygen(unittest.TestCase):
         self.assertIn("水星倒计时32天", panel_lines[3][0])
         self.assertIn("OSIRIS-REx", panel_lines[3][0])
         self.assertIn("距猎户座流星雨极大1天", panel_lines[3][0])
+        self.assertIn("MMX火卫一采样", panel_lines[3][0])
         self.assertEqual(len(data["phase_strip"]), 5)
         labels = [item.get("label", "") for item in data["phase_strip"]]
         self.assertTrue(any("猎户极大" in l for l in labels))
