@@ -27,10 +27,11 @@ class TestSkygen(unittest.TestCase):
         self.assertIn("2026-10-19", data.get("title_sub", ""))
         panel_lines = data.get("panel_lines", [])
         self.assertEqual(len(panel_lines), 4)
-        self.assertIn("ExoMars TGO 入轨十周年整", panel_lines[3][0])
+        self.assertIn("TGO十周年", panel_lines[3][0])
         self.assertIn("IBEX", panel_lines[3][0])
+        self.assertIn("ESCAPADE", panel_lines[3][0])
+        self.assertIn("半百黄金舰队", panel_lines[3][0])
         self.assertIn("距猎户座流星雨2天", panel_lines[3][0])
-        self.assertIn("超级满月7天", panel_lines[3][0])
 
     def test_compute_sky_data_2026_09_19(self):
         data = skygen.compute_sky_data(date_str="2026-09-19", time_str="22:30")

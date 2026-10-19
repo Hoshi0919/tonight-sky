@@ -19,7 +19,7 @@
 
 ## 产物与天体动力学套件
 
-- `tonight-moon-2026-10-19.png` — 农历九月初十盈凸月海报（59.0% 照亮 · ExoMars 痕量气体轨道器 TGO 今日入轨 10 周年整锡婚纪念日 & 星际边界探测器 IBEX 今日发射 18 周年整成人礼 · 鹊桥一号地月 L2 大晕轨道、嫦娥三号月基紫外望远镜 LUT 十三载雨海长巡、TESS 2:1 P/2 地月共振系外行星巡天与 2026 人类深空四十八极终极黄金舰队 The Grand Octoquadragintet 对齐托勒密四十八经典星座全景推演 · 距 10-21 猎户座流星雨极盛 2 天 · 距 10-24 火星奥德赛号 25 周年银禧 5 天 · 距 10-26 近地超级满月 7 天 · 23:49 月落后通宵零月光纯黑暗空）
+- `tonight-moon-2026-10-19.png` — 农历九月初十盈凸月海报（59.0% 照亮 · ExoMars 痕量气体轨道器 TGO 今日入轨 10 周年整锡婚纪念日 & 星际边界探测器 IBEX 今日发射 18 周年整成人礼 · ESCAPADE 双星 Blue & Gold 日地 L2 驻留-奥伯特飞掠轨道、火星立体磁层动力学与 2026 人类深空五十极半百黄金舰队 The Grand Quinquagintet 宏伟全景推演 · 鹊桥一号、嫦娥三号 LUT、TESS 协同对齐 · 距 10-21 猎户座流星雨极盛 2 天 · 距 10-24 火星奥德赛号 25 周年银禧 5 天 · 距 10-26 近地超级满月 7 天 · 23:49 月落后通宵零月光纯黑暗空）
 - `tonight-moon-2026-10-18.png` — 农历九月初九重阳节盈凸月海报（40.8%~49% 照亮 · 旅行者 2 号今日凌晨 00:17 CST 正式突破 20 光时星际大关 · 火星快车号/奥德赛号/ExoMars TGO/MAVEN/希望号火星九极联动 · 月球现役六大金刚 The Lunar Hexad 与 2026 人类深空三十四极黄金舰队 The Grand Quattuortrigintet 全景推演 · 距 10-21 猎户座流星雨极盛 3 天 · 距 10-26 近地超级满月 8 天 · 22:51 月落后通宵零月光纯黑暗空）
 - `tonight-moon-2026-10-17.png` — 农历九月初八上弦月海报（39.0% 照亮 · 日地关系天文台 STEREO-A 20 周年日心超前漂移轨道天体力学、CME 3D 立体视觉重构、太阳远背面 5.2 天超前预警、SECCHI 空间光学与 2026 人类深空二十五极黄金舰队 The Grand Quinvigintet 全景推演 · 旅行者 2 号 20 光时终极跨越今晚 4 小时后准时冲线 · 距 10-21 猎户座流星雨极盛 4 天 · 距 10-26 近地超级满月 9 天 · 21:54 月落后通宵零月光纯黑暗空）
 - `tonight-moon-2026-10-16.png` — 农历九月初七蛾眉月海报（31.0% 照亮 · 太阳轨道飞行器 Solar Orbiter 黄道外极区发电机动力学、520°C 骨黑热障与 2026 人类深空十五极黄金舰队 The Grand Sedecet 全景推演 · 倒计时 69 天平安夜迎来 VGA5 开启 24° 极区新时代 · 距 10-21 猎户座流星雨极盛 5 天 · 距 10-26 近地超级满月 10 天 · 通宵零月光纯黑暗空）
@@ -184,6 +184,12 @@ python3 scripts/ibex_interstellar_boundary_grand_duoquadragintet_engine.py
 # 运行嫦娥五号 DRO、嫦娥六号 L2、月船三号 SHAPE 与四十五极终极舰队推演引擎
 python3 scripts/change5_change6_chandrayaan3_grand_quinquadragintet_engine.py
 
-# 运行全部 482 个单元测试 (pytest)
+# 运行鹊桥一号、嫦娥三号 LUT、TESS 与四十八极黄金舰队推演引擎
+python3 scripts/queqiao1_change3_tess_grand_octoquadragintet_engine.py
+
+# 运行 ESCAPADE 双星 (Blue & Gold) 奥伯特飞掠与人类深空五十极半百黄金舰队推演引擎
+python3 scripts/escapade_blue_gold_grand_quinquagintet_engine.py
+
+# 运行全部 502 个单元测试 (pytest)
 uv run --with pytest --with ephem --with lunardate pytest tests/
 ```
