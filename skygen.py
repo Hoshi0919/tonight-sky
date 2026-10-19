@@ -278,6 +278,8 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
         strip_days = [19, 21, 23, 25, 27]
     elif date_str == '2026-09-20':
         strip_days = [20, 22, 24, 25, 27]
+    elif date_str == '2026-10-20':
+        strip_days = [20, 21, 22, 24, 26]
     elif day == 21:
         strip_days = [21, 23, 25, 27, 29]
     elif day == 22:
@@ -317,11 +319,15 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
                 item['label'] = f"今晚(大潮) · {round(moon.phase)}%"
             else:
                 item['label'] = f"今晚 · {round(moon.phase)}%"
-        elif sday == 23:
+        elif sday == 21 and s_date.month == 10:
+            item['label'] = f"猎户极大 · {round(moon.phase, 1)}%"
+        elif sday == 26 and s_date.month == 10:
+            item['label'] = f"超级满月 · {round(moon.phase, 1)}%"
+        elif sday == 23 and s_date.month == 9:
             item['label'] = f"秋分 · {round(moon.phase, 1)}%"
-        elif sday == 25:
+        elif sday == 25 and s_date.month == 9:
             item['label'] = f"中秋 · {round(moon.phase, 1)}%"
-        elif sday == 27:
+        elif sday == 27 and s_date.month == 9:
             item['label'] = f"满月 · {round(moon.phase, 1)}%"
         strip.append(item)
     obs.date = utc_dt
@@ -367,6 +373,8 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
         l4 = "农历九月初九 · 重阳节 · 旅行者2号今日跨越20光时大关 · 距猎户座流星雨3天 · 超级满月8天"
     elif date_str == '2026-10-19':
         l4 = "农历九月初十 · 盈凸月 · TGO十周年·IBEX十八载·ESCAPADE五十极半百黄金舰队·距猎户座流星雨2天"
+    elif date_str == '2026-10-20':
+        l4 = "农历九月十一 · 盈凸月 · BepiColombo八载铸剑水星倒计时32天·OSIRIS-REx触碰采样六周年·距猎户座流星雨极大1天"
     else:
         days_to_fm = (datetime.date(2026, 10, 26) - local_dt.date()).days
         if days_to_fm > 0:

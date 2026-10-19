@@ -18,6 +18,24 @@ import skygen
 
 @unittest.skipUnless(HAS_EPHEM, "ephem is required for skygen tests")
 class TestSkygen(unittest.TestCase):
+    def test_compute_sky_data_2026_10_20(self):
+        data = skygen.compute_sky_data(date_str="2026-10-20", time_str="22:30")
+        self.assertAlmostEqual(data["moon_t0"]["illum"], 68.3, delta=0.5)
+        self.assertAlmostEqual(data["moon_t0"]["alt"], 23.99, delta=0.5)
+        self.assertIn("2026-10-21 00:47", data["moonset_local"])
+        self.assertIn("九月十一", data.get("title_sub", ""))
+        self.assertIn("2026-10-20", data.get("title_sub", ""))
+        panel_lines = data.get("panel_lines", [])
+        self.assertEqual(len(panel_lines), 4)
+        self.assertIn("BepiColombo八载铸剑", panel_lines[3][0])
+        self.assertIn("水星倒计时32天", panel_lines[3][0])
+        self.assertIn("OSIRIS-REx", panel_lines[3][0])
+        self.assertIn("距猎户座流星雨极大1天", panel_lines[3][0])
+        self.assertEqual(len(data["phase_strip"]), 5)
+        labels = [item.get("label", "") for item in data["phase_strip"]]
+        self.assertTrue(any("猎户极大" in l for l in labels))
+        self.assertTrue(any("超级满月" in l for l in labels))
+
     def test_compute_sky_data_2026_10_19(self):
         data = skygen.compute_sky_data(date_str="2026-10-19", time_str="22:30")
         self.assertAlmostEqual(data["moon_t0"]["illum"], 59.0, delta=0.5)
