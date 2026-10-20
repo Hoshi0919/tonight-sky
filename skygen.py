@@ -280,6 +280,8 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
         strip_days = [20, 22, 24, 25, 27]
     elif date_str == '2026-10-20':
         strip_days = [20, 21, 22, 24, 26]
+    elif date_str == '2026-10-21':
+        strip_days = [21, 22, 24, 26, 28]
     elif day == 21:
         strip_days = [21, 23, 25, 27, 29]
     elif day == 22:
@@ -309,7 +311,9 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
             'is_waxing': bool(strip_waxing)
         }
         if sday == day:
-            if sday == 23:
+            if sday == 21 and s_date.month == 10:
+                item['label'] = f"今晚(猎户极大) · {round(moon.phase)}%"
+            elif sday == 23:
                 item['label'] = f"今晚(秋分) · {round(moon.phase)}%"
             elif sday == 25:
                 item['label'] = f"今晚(中秋) · {round(moon.phase)}%"
@@ -375,6 +379,8 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
         l4 = "农历九月初十 · 盈凸月 · TGO十周年·IBEX十八载·ESCAPADE五十极半百黄金舰队·距猎户座流星雨2天"
     elif date_str == '2026-10-20':
         l4 = "农历九月十一 · 盈凸月 · 今日MMX火卫一采样破晓启航 · BepiColombo八载铸剑水星倒计时32天·OSIRIS-REx触碰采样六周年·距猎户座流星雨极大1天"
+    elif date_str == '2026-10-21':
+        l4 = "农历九月十二 · 猎户座流星雨今夜极盛(后半夜纯黑天窗) · 联盟号圭亚那首飞15周年·联盟TM-33银禧25载·CAPSTONE地月NRHO四周年"
     else:
         days_to_fm = (datetime.date(2026, 10, 26) - local_dt.date()).days
         if days_to_fm > 0:
