@@ -282,6 +282,8 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
         strip_days = [20, 21, 22, 24, 26]
     elif date_str == '2026-10-21':
         strip_days = [21, 22, 24, 26, 28]
+    elif date_str == '2026-10-22':
+        strip_days = [22, 23, 24, 26, 28]
     elif day == 21:
         strip_days = [21, 23, 25, 27, 29]
     elif day == 22:
@@ -381,11 +383,16 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
         l4 = "农历九月十一 · 盈凸月 · 今日MMX火卫一采样破晓启航 · BepiColombo八载铸剑水星倒计时32天·OSIRIS-REx触碰采样六周年·距猎户座流星雨极大1天"
     elif date_str == '2026-10-21':
         l4 = "农历九月十二 · 猎户座流星雨今夜极盛(后半夜纯黑天窗) · 联盟号圭亚那首飞15周年·联盟TM-33银禧25载·CAPSTONE地月NRHO四周年"
+    elif date_str == '2026-10-22':
+        l4 = "农历九月十三 · 盈凸月 · 月船一号发射18周年成年礼(M3水冰首探) · 金星9号首张外星表面全景51周年 · 距超级满月4天"
     else:
         days_to_fm = (datetime.date(2026, 10, 26) - local_dt.date()).days
         if days_to_fm > 0:
             days_to_ori = (datetime.date(2026, 10, 21) - local_dt.date()).days
-            l4 = f"农历{lunar_month_str}{lunar_day_str} · 蛾眉渐盈 · 距猎户座流星雨极盛（10-21）还有 {days_to_ori} 天 · 距近地超级满月（10-26）还有 {days_to_fm} 天"
+            if days_to_ori > 0:
+                l4 = f"农历{lunar_month_str}{lunar_day_str} · 蛾眉渐盈 · 距猎户座流星雨极盛（10-21）还有 {days_to_ori} 天 · 距近地超级满月（10-26）还有 {days_to_fm} 天"
+            else:
+                l4 = f"农历{lunar_month_str}{lunar_day_str} · 盈凸渐满 · 猎户座流星雨余韵 · 距近地超级满月（10-26）还有 {days_to_fm} 天"
         else:
             l4 = f"农历{lunar_month_str}{lunar_day_str} · 10-26 年度近地超级满月 · 月相渐亏"
 
