@@ -203,9 +203,12 @@ python3 scripts/capstone_nrho_cislunar_soyuz_guiana_engine.py
 # 运行月船一号 18 载成年礼与金星 9 号地狱首图 51 周年推演引擎
 python3 scripts/chandrayaan1_venera9_orionids_peak_engine.py
 
+# 运行 Luna 12 六十甲子钻禧与 LAGEOS-2 广义相对论时空拖拽 34 周年推演引擎
+python3 scripts/luna12_lageos2_relativity_engine.py
+
 # 运行嫦娥五号T1十二载跳跃再入、嫦娥一号十九载全月立体测绘与火星奥德赛号银禧 25 周年推演引擎
 python3 scripts/change5t1_change1_odyssey_dynamics_engine.py
 
-# 运行全部 546 个单元测试 (pytest)
+# 运行全部 554 个单元测试 (pytest)
 uv run --with pytest --with ephem --with lunardate pytest tests/
 ```
