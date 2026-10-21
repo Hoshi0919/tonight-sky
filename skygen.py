@@ -284,6 +284,10 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
         strip_days = [21, 22, 24, 26, 28]
     elif date_str == '2026-10-22':
         strip_days = [22, 23, 24, 26, 28]
+    elif date_str == '2026-10-23':
+        strip_days = [23, 24, 25, 26, 28]
+    elif date_str == '2026-10-24':
+        strip_days = [24, 25, 26, 27, 29]
     elif day == 21:
         strip_days = [21, 23, 25, 27, 29]
     elif day == 22:
@@ -385,6 +389,10 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
         l4 = "农历九月十二 · 猎户座流星雨今夜极盛(后半夜纯黑天窗) · 联盟号圭亚那首飞15周年·联盟TM-33银禧25载·CAPSTONE地月NRHO四周年"
     elif date_str == '2026-10-22':
         l4 = "农历九月十三 · 盈凸月 · 月船一号发射18周年成年礼(M3水冰首探) · 金星9号首张外星表面全景51周年 · 距超级满月4天"
+    elif date_str == '2026-10-23':
+        l4 = "农历九月十四 · 盈凸月 · 嫦娥五号T1十二周年(第二宇宙速度跳跃再入) · 猎户座流星雨余韵 · 距超级满月3天"
+    elif date_str == '2026-10-24':
+        l4 = "农历九月十五 · 望月渐近 · 嫦娥一号发射19周年华诞(首幅全月3D图) · 火星奥德赛号轨道切入25周年银禧 · 距超级满月2天"
     else:
         days_to_fm = (datetime.date(2026, 10, 26) - local_dt.date()).days
         if days_to_fm > 0:

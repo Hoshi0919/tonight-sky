@@ -386,5 +386,20 @@ class TestSkygen(unittest.TestCase):
         self.assertIn(loop_up, seg)
         self.assertNotIn("for (let i = steps; i >= 0; i--)", seg)
 
+    def test_october_23_24_panel_lines_and_strip(self):
+        """验证 2026-10-23 与 2026-10-24 嫦娥五号T1/嫦娥一号/火星奥德赛号纪念与相带数据。"""
+        d23 = skygen.compute_sky_data(date_str="2026-10-23", time_str="22:30")
+        self.assertIn("嫦娥五号T1", d23["panel_lines"][3][0])
+        self.assertIn("距超级满月3天", d23["panel_lines"][3][0])
+        strip_dates_23 = [item["date"] for item in d23["phase_strip"]]
+        self.assertEqual(strip_dates_23, ["10-23", "10-24", "10-25", "10-26", "10-28"])
+
+        d24 = skygen.compute_sky_data(date_str="2026-10-24", time_str="22:30")
+        self.assertIn("嫦娥一号", d24["panel_lines"][3][0])
+        self.assertIn("火星奥德赛号", d24["panel_lines"][3][0])
+        self.assertIn("距超级满月2天", d24["panel_lines"][3][0])
+        strip_dates_24 = [item["date"] for item in d24["phase_strip"]]
+        self.assertEqual(strip_dates_24, ["10-24", "10-25", "10-26", "10-27", "10-29"])
+
 if __name__ == "__main__":
     unittest.main()
