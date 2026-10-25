@@ -401,5 +401,14 @@ class TestSkygen(unittest.TestCase):
         strip_dates_24 = [item["date"] for item in d24["phase_strip"]]
         self.assertEqual(strip_dates_24, ["10-24", "10-25", "10-26", "10-27", "10-29"])
 
+    def test_october_25_panel_lines_and_strip(self):
+        """验证 2026-10-25 STEREO双星20周年/金星10号51周年与相带数据。"""
+        d25 = skygen.compute_sky_data(date_str="2026-10-25", time_str="22:30")
+        self.assertIn("STEREO双星发射20周年瓷婚", d25["panel_lines"][3][0])
+        self.assertIn("金星10号着陆51周年", d25["panel_lines"][3][0])
+        self.assertIn("望月前夕", d25["panel_lines"][3][0])
+        strip_dates_25 = [item["date"] for item in d25["phase_strip"]]
+        self.assertEqual(strip_dates_25, ["10-25", "10-26", "10-27", "10-28", "10-29"])
+
 if __name__ == "__main__":
     unittest.main()

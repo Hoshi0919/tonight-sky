@@ -175,3 +175,22 @@ def test_grand_quinvigintet_physical_extremes(engine):
     assert matrix.geocentric_distance_span_ratio > 67000.0
     assert matrix.light_time_span_ratio > 67000.0
     assert matrix.speed_span_ratio > 2.5e7
+
+
+def test_exact_twentieth_anniversary_epoch():
+    from datetime import datetime, timezone
+    from stereo_a_heliospheric_stereoscopy_engine import StereoAHeliosphericStereoscopyEngine
+    engine_20 = StereoAHeliosphericStereoscopyEngine(
+        observation_time=datetime(2026, 10, 25, 0, 52, 0, tzinfo=timezone.utc)
+    )
+    orbit = engine_20.compute_orbit_and_drift_dynamics()
+    assert orbit.years_since_launch == pytest.approx(20.00, abs=1e-3)
+    assert orbit.days_since_launch == pytest.approx(7305.00, abs=1e-2)
+    assert 21.15 < orbit.heliocentric_orbits_completed < 21.20
+    assert 68.10 < orbit.separation_angle_ahead_deg < 68.30
+    assert 1.09 < orbit.distance_to_earth_au < 1.11
+    assert 9.0 < orbit.one_way_light_time_minutes < 9.3
+
+    warning = engine_20.compute_far_side_early_warning()
+    assert 5.10 < warning.advance_lead_time_days < 5.25
+    assert 68.5 < warning.visible_surface_fraction_percent < 69.5
