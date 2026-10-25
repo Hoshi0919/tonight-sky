@@ -319,6 +319,8 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
         if sday == day:
             if sday == 21 and s_date.month == 10:
                 item['label'] = f"今晚(猎户极大) · {round(moon.phase)}%"
+            elif sday == 26 and s_date.month == 10:
+                item['label'] = f"今晚(超级满月) · {round(moon.phase)}%"
             elif sday == 23:
                 item['label'] = f"今晚(秋分) · {round(moon.phase)}%"
             elif sday == 25:
@@ -395,6 +397,8 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
         l4 = "农历九月十五 · 望月渐近 · 嫦娥一号发射19周年华诞(首幅全月3D图) · 火星奥德赛号轨道切入25周年银禧 · 距超级满月2天"
     elif date_str == '2026-10-25':
         l4 = "农历九月十六 · 望月前夕(明晨12:11望) · STEREO双星发射20周年瓷婚·金星10号着陆51周年·双视角日面68.9%覆盖"
+    elif date_str == '2026-10-26':
+        l4 = "农历九月十七 · 猎人超级满月正日(12:11望) · 神舟十七号发射3周年·卡西尼泰坦Ta首探22周年·STEREO双星20周年正日"
     else:
         days_to_fm = (datetime.date(2026, 10, 26) - local_dt.date()).days
         if days_to_fm > 0:

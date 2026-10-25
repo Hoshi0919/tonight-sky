@@ -410,5 +410,16 @@ class TestSkygen(unittest.TestCase):
         strip_dates_25 = [item["date"] for item in d25["phase_strip"]]
         self.assertEqual(strip_dates_25, ["10-25", "10-26", "10-27", "10-28", "10-29"])
 
+    def test_october_26_panel_lines_and_strip(self):
+        """验证 2026-10-26 猎人满月正日/神舟十七号3周年/卡西尼泰坦Ta首探22周年与相带数据。"""
+        d26 = skygen.compute_sky_data(date_str="2026-10-26", time_str="22:30")
+        self.assertIn("猎人超级满月正日", d26["panel_lines"][3][0])
+        self.assertIn("神舟十七号发射3周年", d26["panel_lines"][3][0])
+        self.assertIn("卡西尼泰坦Ta首探22周年", d26["panel_lines"][3][0])
+        self.assertIn("STEREO双星20周年正日", d26["panel_lines"][3][0])
+        strip_dates_26 = [item["date"] for item in d26["phase_strip"]]
+        self.assertEqual(strip_dates_26, ["10-26", "10-27", "10-28", "10-29", "10-30"])
+        self.assertEqual(d26["phase_strip"][0]["label"], "今晚(超级满月) · 100%")
+
 if __name__ == "__main__":
     unittest.main()
