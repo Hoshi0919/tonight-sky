@@ -1,0 +1,35 @@
+{
+  "source": "https://www.seasky.org/astronomy/astronomy-calendar-2026.html (抓取于 2026-11-01 13:01 CST)",
+  "note": "Sea and Sky 2026 公开天文年历 November 外部锚点数据，用于与 ephem 推演结果跨源对照。",
+  "events": {
+    "new_moon": {
+      "date_utc": "2026-11-09",
+      "time_utc": "07:03",
+      "phase": "New Moon"
+    },
+    "full_moon_supermoon": {
+      "date_utc": "2026-11-24",
+      "time_utc": "14:55",
+      "phase": "Full Moon",
+      "is_supermoon": true,
+      "name": "Beaver Moon"
+    },
+    "mercury_greatest_western_elongation": {
+      "date_utc": "2026-11-20",
+      "elongation_deg": 19.6,
+      "direction": "Western"
+    },
+    "uranus_opposition": {
+      "date_utc": "2026-11-25",
+      "event": "Opposition"
+    },
+    "taurids_peak": {
+      "date_range": "November 4, 5",
+      "parent_bodies": ["Asteroid 2004 TG10", "Comet 2P Encke"]
+    },
+    "leonids_peak": {
+      "date_range": "November 17, 18",
+      "parent_body": "Comet 55P/Tempel-Tuttle"
+    }
+  }
+}
