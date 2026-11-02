@@ -436,5 +436,14 @@ class TestSkygen(unittest.TestCase):
         self.assertIn("双筒望远镜一镜通览", d03["panel_lines"][3][0])
         self.assertEqual(d03["phase_strip"][0]["label"], "今晨(三星聚会) · 31%")
 
+    def test_november_04_panel_lines_and_strip(self):
+        """验证 2026-11-04 晨曦空间站天顶掠天与残月相带数据。"""
+        d04 = skygen.compute_sky_data(date_str="2026-11-04", time_str="05:04")
+        self.assertIn("晨曦空间站天顶掠天", d04["panel_lines"][3][0])
+        self.assertIn("05:04 ISS 仰角85.2°", d04["panel_lines"][3][0])
+        self.assertIn("距离427km", d04["panel_lines"][3][0])
+        self.assertIn("残月28%", d04["panel_lines"][3][0])
+        self.assertEqual(d04["phase_strip"][0]["label"], "今晨(空间站掠天) · 22%")
+
 if __name__ == "__main__":
     unittest.main()
