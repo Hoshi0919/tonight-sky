@@ -421,5 +421,20 @@ class TestSkygen(unittest.TestCase):
         self.assertEqual(strip_dates_26, ["10-26", "10-27", "10-28", "10-29", "10-30"])
         self.assertEqual(d26["phase_strip"][0]["label"], "今晚(超级满月) · 100%")
 
+    def test_november_02_and_03_panel_lines_and_strip(self):
+        """验证 2026-11-02 正当下弦月与 2026-11-03 晨曦三星聚会面板行与相带。"""
+        d02 = skygen.compute_sky_data(date_str="2026-11-02", time_str="22:30")
+        self.assertIn("正当下弦月", d02["panel_lines"][3][0])
+        self.assertIn("明晨三星聚会", d02["panel_lines"][3][0])
+        self.assertIn("11-03 05:59", d02["panel_lines"][3][0])
+        self.assertEqual(d02["phase_strip"][0]["label"], "今晚(下弦) · 42%")
+
+        d03 = skygen.compute_sky_data(date_str="2026-11-03", time_str="06:00")
+        self.assertIn("晨曦三星聚会正日", d03["panel_lines"][3][0])
+        self.assertIn("月木极近相切0.69°", d03["panel_lines"][3][0])
+        self.assertIn("火星5°同框", d03["panel_lines"][3][0])
+        self.assertIn("双筒望远镜一镜通览", d03["panel_lines"][3][0])
+        self.assertEqual(d03["phase_strip"][0]["label"], "今晨(三星聚会) · 31%")
+
 if __name__ == "__main__":
     unittest.main()

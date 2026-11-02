@@ -321,6 +321,10 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
                 item['label'] = f"今晚(猎户极大) · {round(moon.phase)}%"
             elif sday == 26 and s_date.month == 10:
                 item['label'] = f"今晚(超级满月) · {round(moon.phase)}%"
+            elif sday == 2 and s_date.month == 11:
+                item['label'] = f"今晚(下弦) · {round(moon.phase)}%"
+            elif sday == 3 and s_date.month == 11:
+                item['label'] = f"今晨(三星聚会) · {round(moon.phase)}%"
             elif sday == 23:
                 item['label'] = f"今晚(秋分) · {round(moon.phase)}%"
             elif sday == 25:
@@ -335,6 +339,10 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
             item['label'] = f"猎户极大 · {round(moon.phase, 1)}%"
         elif sday == 26 and s_date.month == 10:
             item['label'] = f"超级满月 · {round(moon.phase, 1)}%"
+        elif sday == 2 and s_date.month == 11:
+            item['label'] = f"下弦月 · {round(moon.phase, 1)}%"
+        elif sday == 3 and s_date.month == 11:
+            item['label'] = f"三星聚会 · {round(moon.phase, 1)}%"
         elif sday == 23 and s_date.month == 9:
             item['label'] = f"秋分 · {round(moon.phase, 1)}%"
         elif sday == 25 and s_date.month == 9:
@@ -348,7 +356,8 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
     out['station_pass'] = []
 
     # 7. Panel lines
-    l1 = f"今晚 {time_str} · 东部沿海（{lat}°N {lon}°E）· 全天拱极投影 · 星历：pyephem 本地计算"
+    time_prefix = "今晨" if hour < 12 else "今晚"
+    l1 = f"{time_prefix} {time_str} · 东部沿海（{lat}°N {lon}°E）· 全天拱极投影 · 星历：pyephem 本地计算"
     l2 = f"月亮：{round(moon_illum)}% {phase_short} · 月龄 {age_d:.1f} 天 · 距离 {moon_dist_km:,.0f} km · 高度 {moon_alt:.1f}°（{moon_az_zh}天空） · {moonset_str}"
     if moon_sat_sep <= 12.0:
         sat_event = f"土星伴月（相距 {moon_sat_sep:.1f}°）"
@@ -399,6 +408,15 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
         l4 = "农历九月十六 · 望月前夕(明晨12:11望) · STEREO双星发射20周年瓷婚·金星10号着陆51周年·双视角日面68.9%覆盖"
     elif date_str == '2026-10-26':
         l4 = "农历九月十七 · 猎人超级满月正日(12:11望) · 神舟十七号发射3周年·卡西尼泰坦Ta首探22周年·STEREO双星20周年正日"
+    elif date_str == '2026-11-01':
+        l4 = "农历九月廿三 · 下弦月渐亏 · 土星正南全夜可见 · 晨曦三星聚会（11-03 05:59 月木极近相切0.69°·火星5°同框）倒计时 32 小时"
+    elif date_str == '2026-11-02':
+        l4 = "农历九月廿四 · 正当下弦月（04:28下弦·50.1%半月）· 明晨三星聚会（11-03 05:59 月木极近相切0.69°·火星5°同框）倒计时 24 小时"
+    elif date_str == '2026-11-03':
+        l4 = "农历九月廿五 · 晨曦三星聚会正日（05:59 月木极近相切0.69°·火星5°同框·黎明仰角69°）· 双筒望远镜一镜通览"
+    elif date_str > '2026-11-03' and date_str < '2026-11-09':
+        days_to_nm = (datetime.date(2026, 11, 9) - local_dt.date()).days
+        l4 = f"农历{lunar_month_str}{lunar_day_str} · 残月渐细 · 晨曦三星相送 · 距朔日新月纯黑天窗（11-09）还有 {days_to_nm} 天"
     else:
         days_to_fm = (datetime.date(2026, 10, 26) - local_dt.date()).days
         if days_to_fm > 0:
