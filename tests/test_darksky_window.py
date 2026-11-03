@@ -88,3 +88,25 @@ def test_full_pipeline_run_and_json():
     assert "targets_at_sample" in first
     assert "M31" in first["targets_at_sample"]
     assert "Saturn" in first["targets_at_sample"]
+
+
+def test_overnight_midnight_crossing_window_and_targets():
+    """验证跨午夜月出（如 11 月上旬）暗夜窗口推演与目标仰角计算，防止采样时刻倒退至日间"""
+    res = run_transition_analysis("2026-11-03", days=2)
+    assert len(res["nights"]) == 2
+    n1103 = res["nights"][0]
+    assert n1103["date"] == "2026-11-03"
+    assert n1103["dark_window_hours"] > 6.0
+    assert n1103["status"].startswith("PRISTINE")
+
+    # 采样时间必须在夜间 (18:26 到 01:02 之间)，不能倒退到上午
+    sample_time_str = n1103["sample_observation_time"]
+    hour = int(sample_time_str.split(":")[0])
+    assert hour >= 18 or hour <= 1, f"采样时间 {sample_time_str} 不在暗夜窗口内"
+
+    # 深空天体与土星仰角必须高悬，绝不能为负值 (地平线以下)
+    tgts = n1103["targets_at_sample"]
+    assert tgts["M31"]["altitude_deg"] > 70.0  # 接近中天
+    assert tgts["M33"]["altitude_deg"] > 70.0
+    assert tgts["Double_Cluster"]["altitude_deg"] > 50.0
+    assert tgts["Saturn"]["altitude_deg"] > 50.0

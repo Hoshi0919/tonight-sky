@@ -236,6 +236,9 @@ def run_transition_analysis(start_date_str="2026-09-28", days=9, lat="31.2304", 
         if win["dark_window_start"] and win["dark_window_end"]:
             st = datetime.datetime.strptime(f"{win['date']} {win['dark_window_start']}", "%Y-%m-%d %H:%M:%S").replace(tzinfo=CST)
             et = datetime.datetime.strptime(f"{win['date']} {win['dark_window_end']}", "%Y-%m-%d %H:%M:%S").replace(tzinfo=CST)
+            if et <= st:
+                # 跨午夜进入次日凌晨
+                et += datetime.timedelta(days=1)
             sample_time = st + (et - st) / 2
         else:
             sample_time = datetime.datetime(cur_date.year, cur_date.month, cur_date.day, 21, 0, tzinfo=CST)
@@ -280,14 +283,21 @@ def format_cli_report(data):
         lines.append(f"{dt_str:10s} | {sunset:5s} | {adusk:5s} | {mrise:14s} | {dur:10s} | {span:15s} | {n['status']}")
         
     lines.append("-" * 88)
-    lines.append("\n【核心深空天体与土星在 10-04（土星冲日夜，暗夜窗口 4.88 小时）视界参数】")
+    # 提取目标观测夜（优先 10-04 冲日夜，若无则取区间内暗夜最长或最后一夜）
+    target_night = next((n for n in data["nights"] if n["date"] == "2026-10-04"), data["nights"][-1])
+    sample_time_str = target_night.get("sample_observation_time", "21:00")
+    t_date = target_night["date"]
+    t_hours = target_night["dark_window_hours"]
+    if t_date == "2026-10-04":
+        header_desc = f"10-04（土星冲日夜，暗夜窗口 {t_hours:.2f} 小时，采样 {sample_time_str} CST）"
+    else:
+        header_desc = f"{t_date}（暗夜窗口 {t_hours:.2f} 小时，采样 {sample_time_str} CST）"
+
+    lines.append(f"\n【核心深空天体与土星在 {header_desc} 视界参数】")
     lines.append("-" * 88)
-    lines.append(f"{'天体名称':24s} | {'视星等':6s} | {'中天高度':8s} | {'21:00 仰角':10s} | {'方位角':8s} | {'观测建议'}")
+    lines.append(f"{'天体名称':24s} | {'视星等':6s} | {'中天高度':8s} | {f'{sample_time_str} 仰角':10s} | {'方位角':8s} | {'观测建议'}")
     lines.append("-" * 88)
-    
-    # 提取 10-04 的目标
-    n1004 = next((n for n in data["nights"] if n["date"] == "2026-10-04"), data["nights"][-1])
-    tgts = n1004["targets_at_sample"]
+    tgts = target_night["targets_at_sample"]
     
     tips = {
         "M31": "仙女座大星系，上中天近 80° 几乎直视天顶，双筒可见明显纺锤状银心",
