@@ -64,8 +64,8 @@ def calculate_night_window(obs, date_cst):
     noon_cst = datetime.datetime(date_cst.year, date_cst.month, date_cst.day, 12, 0, tzinfo=CST)
     noon_utc = noon_cst.astimezone(UTC)
     
-    # 日落 (地平线 -0:34)
-    obs.horizon = '-0:34'
+    # 日落 (标准物理地平线 0，ephem 内置 -34' 折射与视半直径)
+    obs.horizon = '0'
     obs.date = ephem.Date(noon_utc)
     sunset_utc = obs.next_setting(ephem.Sun()).datetime().replace(tzinfo=UTC)
     sunset_cst = sunset_utc.astimezone(CST)
@@ -90,7 +90,7 @@ def calculate_night_window(obs, date_cst):
     
     # 次日日出与天文晨光始
     next_noon_utc = (noon_cst + datetime.timedelta(days=1)).astimezone(UTC)
-    obs.horizon = '-0:34'
+    obs.horizon = '0'
     obs.date = ephem.Date(noon_utc)
     sunrise_utc = obs.next_rising(ephem.Sun()).datetime().replace(tzinfo=UTC)
     sunrise_cst = sunrise_utc.astimezone(CST)
@@ -100,8 +100,8 @@ def calculate_night_window(obs, date_cst):
     astro_dawn_utc = obs.next_rising(ephem.Sun(), use_center=True).datetime().replace(tzinfo=UTC)
     astro_dawn_cst = astro_dawn_utc.astimezone(CST)
     
-    # 月升与月落
-    obs.horizon = '-0:34'
+    # 月升与月落 (标准物理地平线 0，ephem 内置大气折射与视半直径)
+    obs.horizon = '0'
     obs.date = ephem.Date(noon_utc)
     moonrise_utc = obs.next_rising(ephem.Moon()).datetime().replace(tzinfo=UTC)
     moonrise_cst = moonrise_utc.astimezone(CST)

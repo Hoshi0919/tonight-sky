@@ -90,8 +90,8 @@ def compute_twilight_boundaries(obs: ephem.Observer, date_cst: datetime.date, mo
     sun = ephem.Sun()
 
     if mode == "dusk":
-        # 日落 (日轮上边缘下切地平，考虑大气折射 -0:34)
-        obs.horizon = "-0:34"
+        # 日落 (标准物理地平线 0，ephem 内置 -34' 折射与视半直径)
+        obs.horizon = "0"
         obs.date = ephem.Date(ref_time_utc)
         sunset_utc = obs.next_setting(sun).datetime().replace(tzinfo=UTC)
         sunset_cst = sunset_utc.astimezone(CST)
@@ -141,7 +141,7 @@ def compute_twilight_boundaries(obs: ephem.Observer, date_cst: datetime.date, mo
         civil_dawn_utc = obs.next_rising(sun, use_center=True).datetime().replace(tzinfo=UTC)
         civil_dawn_cst = civil_dawn_utc.astimezone(CST)
 
-        obs.horizon = "-0:34"
+        obs.horizon = "0"
         obs.date = ephem.Date(ref_time_utc)
         sunrise_utc = obs.next_rising(sun).datetime().replace(tzinfo=UTC)
         sunrise_cst = sunrise_utc.astimezone(CST)

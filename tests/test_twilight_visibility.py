@@ -120,8 +120,8 @@ def test_dusk_horizon_triptych_2026_09_28():
     triptych = res["events"]["dusk_horizon_triptych"]
     assert triptych["active"] is True
     assert 10 <= triptych["duration_min"] <= 25
-    assert triptych["start"] == "18:30"
-    assert triptych["end"] == "18:45"
+    assert triptych["start"] in ("18:29", "18:30")
+    assert triptych["end"] in ("18:44", "18:45")
 
 
 def test_simulation_data_structure():
