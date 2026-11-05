@@ -13,7 +13,7 @@ taurids_dynamics_engine.py
    - 起源于约 20,000 年前一颗超巨型内太阳系瓦解彗星（直径 > 100 km）。
 2. 双分支交角与流星雨流形：
    - 南金牛座流星雨 (STA, IAU #002)：降交点分支，极大期 10-10 ~ 11-05，v_inf = 27.3 km/s。
-   - 北金牛座流星雨 (NTA, IAU #001)：升交点分支，极大期 11-12，v_inf = 29.0 km/s。
+   - 北金牛座流星雨 (NTA, IAU #017)：升交点分支，极大期 11-12，v_inf = 29.0 km/s。
    - NTA 辐射点（RA 03h52m, Dec +22.0°）距昴星团 M45 仅 2.36°！
 3. 27.0 ~ 29.0 km/s 极低速切入与平流层深穿透物理：
    - 大气层动能密度仅 372.6 ~ 420.5 MJ/kg（仅自身重量 89 ~ 100 倍 TNT 当量，狮子座的 14.8%）。
@@ -74,7 +74,7 @@ TAURID_BRANCHES = {
         "name": "Northern Taurids",
         "chinese_name": "北金牛座流星雨",
         "iau_code": "NTA",
-        "iau_number": 1,
+        "iau_number": 17,
         "peak_window": "10-20 ~ 12-10",
         "nominal_peak": "11-12",
         "v_entry_kms": 29.0,
