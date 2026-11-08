@@ -154,8 +154,8 @@ class Pioneer9ParkerPerihelionEngine:
         """
         2026-11-08 农历九月三十晦日暗空与朔日倒计时
         """
-        # 精确新月时间：2026-11-08 23:02:03 UTC (北京时间 2026-11-09 07:02:03 CST)
-        new_moon_dt = datetime.datetime(2026, 11, 8, 23, 2, 3, tzinfo=datetime.timezone.utc)
+        # 精确新月时间：2026-11-09 07:02:03 UTC (北京时间 2026-11-09 15:02:03 CST)
+        new_moon_dt = datetime.datetime(2026, 11, 9, 7, 2, 3, tzinfo=datetime.timezone.utc)
         countdown_hours = (new_moon_dt - self.current_dt).total_seconds() / 3600.0
 
         return {

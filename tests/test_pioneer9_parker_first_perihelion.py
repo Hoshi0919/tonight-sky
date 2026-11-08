@@ -89,7 +89,7 @@ def test_night_darksky_status():
     assert sky["lunar_phase_percent"] < 1.0
     # 月龄接近 29 天
     assert 28.0 < sky["moon_age_days"] < 29.5
-    # 距精确新月朔日小于 12 小时
-    assert 0 < sky["hours_to_exact_new_moon"] < 12.0
+    # 距精确新月朔日约 16.5 小时 (明日 15:02 CST)
+    assert 15.0 < sky["hours_to_exact_new_moon"] < 18.0
     # 100% 纯黑夜空
     assert sky["darksky_window_percent"] == 100.0
