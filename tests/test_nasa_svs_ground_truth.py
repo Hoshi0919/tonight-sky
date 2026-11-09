@@ -80,3 +80,37 @@ def test_hunters_supermoon_anchor():
     assert res["nasa"]["phase"] == 99.84
     assert res["discrepancy"]["phase_pct"] < 0.01
     assert res["discrepancy"]["distance_km"] < 35.0
+
+
+def test_new_moon_2026_11_09_maximum_residual_phase_anchor():
+    """Verify 2026-11-09 07:00 UT (New Moon / 朔日) against NASA SVS.
+    Demonstrates that off-node new moons possess a physical non-zero residual phase (0.19%)
+    due to 5.0° orbital inclination offset from the ecliptic.
+    """
+    dt = datetime.datetime(2026, 11, 9, 7, 0)
+    res = val.query_at_time(dt)
+    assert res["nasa"]["phase"] == 0.19
+    assert res["discrepancy"]["phase_pct"] < 0.01
+    assert res["discrepancy"]["distance_km"] < 5.0
+
+
+def test_all_2026_new_moons_inclination_modulation():
+    """Verifies the sinusoidal modulation of new moon residual illumination across all 12 months of 2026:
+    - Eclipse seasons (Feb & Aug) reach near-zero (<= 0.02%)
+    - Peak off-node seasons (May & Nov) reach maximum residual illumination (>= 0.18%)
+    """
+    data = val.load_nasa_svs_data()
+    minima = {}
+    for r in data:
+        dt = datetime.datetime.strptime(r["time"], "%d %b %Y %H:%M UT")
+        m = dt.month
+        if m not in minima or r["phase"] < minima[m]["phase"]:
+            minima[m] = r
+
+    assert len(minima) == 12
+    # Feb 2026 (Annular Eclipse) & Aug 2026 (Total Eclipse)
+    assert minima[2]["phase"] <= 0.02
+    assert minima[8]["phase"] <= 0.02
+    # May 2026 & Nov 2026 (Peak off-node)
+    assert minima[5]["phase"] >= 0.18
+    assert minima[11]["phase"] >= 0.18
