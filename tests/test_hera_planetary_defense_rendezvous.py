@@ -180,3 +180,14 @@ def test_summary_report_generation(engine):
     assert "帕克太阳探测器" in report
     assert "欧罗巴快船" in report
     assert len(report.splitlines()) > 35
+
+
+def test_hera_actual_arrival_ground_truth(engine):
+    """测试赫拉号 2026 年 11 月真实到达与 ESA 官方首张特写真值"""
+    telemetry = engine.compute_actual_arrival_telemetry()
+    assert "2026-11-04" in telemetry["arrival_manoeuvre_ecp1_utc"]
+    assert telemetry["first_close_up_published_date"] == "2026-11-05"
+    assert telemetry["first_close_up_distance_km"] == 60.0
+    assert "Early Characterisation" in telemetry["current_mission_phase"]
+    assert telemetry["relative_speed_cms"] == 12.0
+    assert telemetry["berlin_museum_reveal_date"] == "2026-11-25"

@@ -344,6 +344,26 @@ class HeraPlanetaryDefenseRendezvousEngine:
         ]
         return events
 
+    def compute_actual_arrival_telemetry(self) -> Dict[str, Any]:
+        """
+        根据 ESA 2026 年 11 月 5 日官方公开发布与飞行控制中心遥测对表：
+        赫拉号在轨制动、ECP-1 正式交会到达与首张特写拍摄真值
+        """
+        return {
+            "brm1_actual_status": "Success on 2026-10-15 (90% morning burn + 10% trim)",
+            "brm2_actual_status": "Success on 2026-10-22 (31 min burn, cut relative speed by 70 m/s to 20 m/s from 2,300 km)",
+            "transition_manoeuvres_trm": "Executed 2026-10-25 to 2026-10-31",
+            "arrival_manoeuvre_ecp1_utc": "2026-11-04 01:00:00 UTC",
+            "arrival_status": "Arrived at Didymos-Dimorphos system on 2026-11-04 (ECP-1)",
+            "first_close_up_published_date": "2026-11-05",
+            "first_close_up_distance_km": 60.0,
+            "framing_camera": "Monochromatic Asteroid Framing Camera (AFC)",
+            "current_mission_phase": "Early Characterisation Phase (2026-11-04 to 2026-12-15)",
+            "proximity_distance_range_km": [20.0, 30.0],
+            "relative_speed_cms": 12.0,
+            "berlin_museum_reveal_date": "2026-11-25",
+        }
+
     def get_summary_report(self) -> str:
         """生成人类深空五极黄金大冲刺与赫拉号推演综合文本摘要"""
         ast = self.compute_asteroid_microgravity_metrics()
