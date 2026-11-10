@@ -428,6 +428,15 @@ def compute_sky_data(date_str='2026-09-20', time_str='22:30', lat='31.23', lon='
         l4 = "农历十月初一 · 朔日正日(15:02精确朔) · 土星5号/阿波罗4号首飞59周年 · 卡尔萨根诞辰92周年(暗淡蓝点) · 100%纯黑夜空"
     elif date_str == '2026-11-10':
         l4 = "农历十月初二 · 纤细初生蛾眉月2% · 月球轨道器2号环月切入60周年钻禧 · 月球17号/月球车1号发射56周年(首辆地外巡视器·雨海激光测距) · 22:30土星西南55°"
+    elif date_str == '2026-11-11':
+        l4 = "农历十月初三 · 蛾眉微盈5% · 双子座12号发射60周年钻禧(交会博士Aldrin手算交会·水下EVA革命) · 2019水星凌日7周年共振 · 纯黑深空天窗"
+    elif date_str > '2026-11-11' and date_str <= '2026-11-24':
+        days_to_fm = (datetime.date(2026, 11, 24) - local_dt.date()).days
+        days_to_leo = (datetime.date(2026, 11, 18) - local_dt.date()).days
+        if days_to_leo > 0:
+            l4 = f"农历{lunar_month_str}{lunar_day_str} · 蛾眉渐盈 · 距狮子座流星雨（11-18）还有 {days_to_leo} 天 · 距十月望日满月还有 {days_to_fm} 天"
+        else:
+            l4 = f"农历{lunar_month_str}{lunar_day_str} · 盈凸渐满 · 距十月望日满月（11-24）还有 {days_to_fm} 天"
     elif date_str > '2026-11-04' and date_str < '2026-11-09':
         days_to_nm = (datetime.date(2026, 11, 9) - local_dt.date()).days
         l4 = f"农历{lunar_month_str}{lunar_day_str} · 残月渐细 · 晨曦三星相送 · 距朔日新月纯黑天窗（11-09）还有 {days_to_nm} 天"
